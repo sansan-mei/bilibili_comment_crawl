@@ -1,0 +1,5 @@
+.env
+node_modules
+dist
+bilibili_comment**
+bun.lockb

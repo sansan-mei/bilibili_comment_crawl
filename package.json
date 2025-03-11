@@ -1,0 +1,17 @@
+{
+  "name": "bilibili-comment-crawler",
+  "version": "1.0.0",
+  "description": "Bilibili comment crawler in JS",
+  "scripts": {
+    "dev": "node --env-file=.env crawl.mjs"
+  },
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "user-agents": "^1.1.475"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/user-agents": "^1.0.4"
+  }
+}
