@@ -49,4 +49,4 @@ COOKIES = your_cookies_here;
 OID = 视频的oid;
 ```
 
-然后 yarn dev 跑就完事了
+然后 yarn dev 跑就完事了, 或者 yarn dev [OID]

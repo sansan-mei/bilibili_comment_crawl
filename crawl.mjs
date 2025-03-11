@@ -18,8 +18,11 @@ import UserAgent from "user-agents";
  * @param {number} page - 页码
  * @returns {string} 请求URL
  */
-const url = (page) =>
-  `https://api.bilibili.com/x/v2/reply/main?csrf=40a227fcf12c380d7d3c81af2cd8c5e8&mode=3&next=${page}&oid=${process.env.OID}&plat=1&type=1`;
+const url = (page) => {
+  const oid = process.argv[2] || process.env.OID
+  return `https://api.bilibili.com/x/v2/reply/main?csrf=40a227fcf12c380d7d3c81af2cd8c5e8&mode=3&next=${page}&oid=${oid}&plat=1&type=1`;
+}
+
 
 const header = {
   "user-agent": new UserAgent().toString(),
