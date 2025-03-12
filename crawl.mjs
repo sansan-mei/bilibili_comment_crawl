@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import UserAgent from "user-agents";
-
+import { delay } from "./utils/index.mjs";
 
 const oid = process.argv[2] || process.env.OID
 /**
@@ -86,7 +86,7 @@ const crawlBilibiliComments = async () => {
         comments.push(commentObj);
       }
 
-      console.log(`搜集到${comments.reduce((acc, cur) => acc + cur.replyCount, 0)}条评论`);
+      console.log(`搜集到${comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)}条评论`);
 
       // 调整爬虫策略，上一次评论总数和这一次评论总数进行比较，如果有改变说明有新数据，如果没改变说明数据全部搜集完毕，爬虫停止
       if (comments.length === preCommentLength) {
@@ -103,18 +103,41 @@ const crawlBilibiliComments = async () => {
 
   // 调整代码，将其写成json,同时格式化后再保存
   // 再保存一份txt的
+
+  // 创建以oid命名的目录
+  const outputDir = path.join(__dirname, oid.toString());
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
   fs.writeFileSync(
-    path.join(__dirname, "bilibili_comment.json"),
+    path.join(outputDir, "bilibili_comment.json"),
     JSON.stringify(comments, null, 2),
     { encoding: "utf-8" }
   );
 
   const txtContent = comments
-    .map((c) => `${c.author}：${c.sex}：${c.time}：${c.content}`)
-    .join("\n");
-  fs.writeFileSync(path.join(__dirname, "bilibili_comment.txt"), txtContent, {
+    .map((c) => {
+      // 主评论
+      let commentText = `${c.author}：${c.sex}：${c.time}：${c.content}`;
+
+      // 添加子评论（如果有）
+      if (c.childList && c.childList.length > 0) {
+        const childComments = c.childList
+          .map(child => `  └─ ${child.author}：${child.sex}：${child.time}：${child.content}`)
+          .join("\n");
+        commentText += "\n" + childComments;
+      }
+
+      return commentText;
+    })
+    .join("\n\n");  // 使用两个换行符分隔不同的主评论及其子评论
+
+  fs.writeFileSync(path.join(outputDir, "bilibili_comment.txt"), txtContent, {
     encoding: "utf-8",
   });
+
+  console.log(`评论已保存到目录: ${outputDir}`);
 };
 
 // 执行爬虫
