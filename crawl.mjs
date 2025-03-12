@@ -45,6 +45,7 @@ const crawlBilibiliComments = async () => {
       const response = await axios.get(getMainCommentUrl(i, oid), {
         headers: header,
       });
+      await delay()
       i += 1; // 获取到下一页
 
       const responseData = response.data;
