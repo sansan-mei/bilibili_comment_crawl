@@ -3,7 +3,13 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import UserAgent from "user-agents";
-import { delay } from "./utils/index.mjs";
+import {
+  delay,
+  ensureDirectoryExists,
+  formatCommentsToTxt,
+  getMainCommentUrl,
+  getReplyUrl
+} from "./utils/index.mjs";
 
 const oid = process.argv[2] || process.env.OID
 /**
@@ -17,17 +23,6 @@ const oid = process.argv[2] || process.env.OID
  * @property {number} replyCount - 子评论数量
  */
 
-/**
- * @param {number} page - 页码
- * @returns {string} 请求URL
- */
-const url = (page) => {
-  return `https://api.bilibili.com/x/v2/reply/main?csrf=40a227fcf12c380d7d3c81af2cd8c5e8&mode=3&next=${page}&oid=${oid}&plat=1&type=1`;
-}
-
-const replyUrl = (rpid) => {
-  return `https://api.bilibili.com/x/v2/reply/reply?oid=${oid}&type=1&root=${rpid}&ps=50000&pn=1`;
-}
 const header = {
   "user-agent": new UserAgent().toString(),
   cookie: process.env.COOKIES,
@@ -47,7 +42,7 @@ const crawlBilibiliComments = async () => {
 
   while (true) {
     try {
-      const response = await axios.get(url(i), {
+      const response = await axios.get(getMainCommentUrl(i, oid), {
         headers: header,
       });
       i += 1; // 获取到下一页
@@ -61,6 +56,7 @@ const crawlBilibiliComments = async () => {
       for (const content of replies) {
         const replyCount = content.rcount
 
+        /** @type {Comment} */
         const commentObj = {
           content: content.content.message,
           author: content.member.uname,
@@ -72,7 +68,7 @@ const crawlBilibiliComments = async () => {
         }
         if (replyCount > 0) {
           await delay()
-          const { data: replyResponse } = await axios.get(replyUrl(content.rpid), {
+          const { data: replyResponse } = await axios.get(getReplyUrl(content.rpid, oid), {
             headers: header,
           })
           commentObj.childList = replyResponse.data.replies.map(reply => ({
@@ -106,9 +102,7 @@ const crawlBilibiliComments = async () => {
 
   // 创建以oid命名的目录
   const outputDir = path.join(__dirname, oid.toString());
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-  }
+  ensureDirectoryExists(outputDir);
 
   fs.writeFileSync(
     path.join(outputDir, "bilibili_comment.json"),
@@ -116,22 +110,7 @@ const crawlBilibiliComments = async () => {
     { encoding: "utf-8" }
   );
 
-  const txtContent = comments
-    .map((c) => {
-      // 主评论
-      let commentText = `${c.author}：${c.sex}：${c.time}：${c.content}`;
-
-      // 添加子评论（如果有）
-      if (c.childList && c.childList.length > 0) {
-        const childComments = c.childList
-          .map(child => `  └─ ${child.author}：${child.sex}：${child.time}：${child.content}`)
-          .join("\n");
-        commentText += "\n" + childComments;
-      }
-
-      return commentText;
-    })
-    .join("\n\n");  // 使用两个换行符分隔不同的主评论及其子评论
+  const txtContent = formatCommentsToTxt(comments);
 
   fs.writeFileSync(path.join(outputDir, "bilibili_comment.txt"), txtContent, {
     encoding: "utf-8",
