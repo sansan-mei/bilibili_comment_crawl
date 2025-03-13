@@ -1,3 +1,6 @@
+// 导入fs模块，用于ensureDirectoryExists函数
+import fs from "fs";
+
 // 延时函数
 export const delay = (ms = 200) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -23,7 +26,7 @@ export const getReplyUrl = (rpid, oid) => {
 
 /**
  * 格式化评论为TXT内容
- * @param {Array} comments - 评论数组
+ * @param {AnyArray} comments - 评论数组
  * @returns {string} 格式化后的TXT内容
  */
 export const formatCommentsToTxt = (comments) => {
@@ -35,6 +38,7 @@ export const formatCommentsToTxt = (comments) => {
       // 添加子评论（如果有）
       if (c.childList && c.childList.length > 0) {
         const childComments = c.childList
+          // @ts-ignore
           .map(child => `  └─ ${child.author}：${child.sex}：${child.time}：${child.content}`)
           .join("\n");
         commentText += "\n" + childComments;
@@ -55,5 +59,12 @@ export const ensureDirectoryExists = (dirPath) => {
   }
 };
 
-// 导入fs模块，用于ensureDirectoryExists函数
-import fs from "fs";
+
+/**
+ * 获取B站视频详情URL
+ * @param {string} b_vid - B站视频ID
+ * @returns {string} 视频详情URL
+ */
+export const getBilibiliDetailUrl = (b_vid) => {
+  return `https://api.bilibili.com/x/web-interface/view?bvid=${b_vid}`
+}
