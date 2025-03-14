@@ -276,3 +276,27 @@ export const formatTime = (seconds) => {
 export const existFile = (filePath) => {
   return fs.existsSync(filePath);
 };
+
+// 将视频信息、评论、弹幕合成为一个txt文件
+/**
+ * 将视频信息、评论、弹幕合成为一个txt文件
+ * @param {string} videoInfo - 视频信息
+ * @param {string} comments - 评论
+ * @param {string} danmus - 弹幕
+ * @returns {string} - 合成的txt文件内容
+ */
+export const mergeTxt = (videoInfo, comments, danmus) => {
+  const txtContent = `视频信息：\n${videoInfo}\n评论：\n${comments}\n弹幕：\n${danmus}`;
+  return txtContent;
+};
+
+
+/**
+ * 清理文件名，移除不允许的特殊字符
+ * @param {string} filename - 原始文件名
+ * @returns {string} - 清理后的文件名
+ */
+export const sanitizeFilename = (filename) => {
+  // 替换Windows和大多数文件系统不允许的字符
+  return filename.replace(/[\\/:*?"<>|]/g, '_');
+}

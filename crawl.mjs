@@ -13,7 +13,9 @@ import {
   getBilibiliDetailUrl,
   getMainCommentUrl,
   getReplyUrl,
-  processVideoDetail
+  mergeTxt,
+  processVideoDetail,
+  sanitizeFilename
 } from "./utils/index.mjs";
 
 /**
@@ -60,6 +62,7 @@ const header = {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+
 /**
  * 爬取B站评论
  * @returns {Promise<void>}
@@ -97,11 +100,13 @@ const crawlBilibiliComments = async () => {
 
   process.env.OID = detail.oid.toString();
 
-  // 创建以oid命名的目录
-  const outputDir = path.join(__dirname, `${detail.title}-${detail.oid}`);
+  // 创建以oid命名的目录，清理文件名中的特殊字符
+  const sanitizedTitle = sanitizeFilename(detail.title);
+  const outputDir = path.join(__dirname, `${sanitizedTitle}-${detail.oid}`);
   ensureDirectoryExists(outputDir);
 
   const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");
+  let danmakuTxtContent = ''
 
   /** @做一个函数，当读取到的弹幕数量有detail.danmaku的80%时就不读取 */
   if (!existFile(danmakuFilePath)) {
@@ -109,7 +114,7 @@ const crawlBilibiliComments = async () => {
     console.log(`成功获取${danmus.length}条弹幕，占总弹幕数的${((danmus.length / detail.danmaku) * 100).toFixed(2)}%`);
 
     // 将弹幕转换为简单的文本格式
-    const danmakuTxtContent = formatDanmakuToTxt(danmus);
+    danmakuTxtContent = formatDanmakuToTxt(danmus);
     fs.writeFileSync(
       danmakuFilePath,
       danmakuTxtContent,
@@ -201,6 +206,11 @@ const crawlBilibiliComments = async () => {
   });
 
   fs.writeFileSync(path.join(outputDir, "bilibili_detail.json"), JSON.stringify(detail, null, 2), {
+    encoding: "utf-8",
+  });
+
+  const allTxtContent = mergeTxt(JSON.stringify(detail), txtContent, danmakuTxtContent);
+  fs.writeFileSync(path.join(outputDir, "bilibili_all.txt"), allTxtContent, {
     encoding: "utf-8",
   });
 
