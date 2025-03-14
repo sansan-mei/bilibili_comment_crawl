@@ -6,10 +6,13 @@ import UserAgent from "user-agents";
 import {
   delay,
   ensureDirectoryExists,
+  fetchDanmaku,
   formatCommentsToTxt,
+  formatDanmakuToTxt,
   getBilibiliDetailUrl,
   getMainCommentUrl,
   getReplyUrl,
+  processVideoDetail
 } from "./utils/index.mjs";
 
 /**
@@ -92,6 +95,10 @@ const crawlBilibiliComments = async () => {
   processVideoDetail(detail, detailResponse.data);
 
   process.env.OID = detail.oid.toString();
+
+  /** @做一个函数，当读取到的弹幕数量有detail.danmaku的80%时就不读取 */
+  const danmus = await fetchDanmaku(detail.cid, detail.danmaku);
+  console.log(`成功获取${danmus.length}条弹幕，占总弹幕数的${((danmus.length / detail.danmaku) * 100).toFixed(2)}%`);
 
   while (true) {
     try {
@@ -185,33 +192,27 @@ const crawlBilibiliComments = async () => {
     encoding: "utf-8",
   });
 
+  // 保存弹幕数据
+  fs.writeFileSync(
+    path.join(outputDir, "bilibili_danmaku.json"),
+    JSON.stringify(danmus, null, 2),
+    { encoding: "utf-8" }
+  );
+
+  // 将弹幕转换为简单的文本格式
+  const danmakuTxtContent = formatDanmakuToTxt(danmus);
+  fs.writeFileSync(
+    path.join(outputDir, "bilibili_danmaku.txt"),
+    danmakuTxtContent,
+    { encoding: "utf-8" }
+  );
+
   fs.writeFileSync(path.join(outputDir, "bilibili_detail.json"), JSON.stringify(detail, null, 2), {
     encoding: "utf-8",
   });
 
-  console.log(`评论已保存到目录: ${outputDir}`);
+  console.log(`评论和弹幕已保存到目录: ${outputDir}`);
 };
-
-/**
- * 处理视频详情数据
- * @param {BilibiliDetail} detail - 视频详情对象
- * @param {any} data - API返回的数据
- * @returns {void}
- */
-function processVideoDetail(detail, data) {
-  detail.title = data.title;
-  detail.description = data.desc;
-  detail.oid = data.aid;
-  detail.view = data.stat.view;
-  detail.danmaku = data.stat.danmaku;
-  detail.reply = data.stat.reply;
-  detail.favorite = data.stat.favorite;
-  detail.coin = data.stat.coin;
-  detail.share = data.stat.share;
-  detail.like = data.stat.like;
-  detail.cid = data.cid;
-  detail.danmaku = data.stat.danmaku;
-}
 
 // 执行爬虫
 crawlBilibiliComments().catch((error) => {

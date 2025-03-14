@@ -7,7 +7,7 @@ const root = protobuf.loadSync("./bilibli.proto");
 const DmSegMobileReply = root.lookupType('bilibili.community.service.dm.v1.DmSegMobileReply');
 
 // 延时函数
-export const delay = (ms = 200) => new Promise(resolve => setTimeout(resolve, ms));
+export const delay = (ms = 400) => new Promise(resolve => setTimeout(resolve, ms + Math.floor(Math.random() * 200)));
 
 /**
  * 生成主评论请求URL
@@ -164,4 +164,105 @@ export const fetchBilDanMu = async (oid, segmentIndex = '1') => {
     }
     return undefined;
   }
+};
+
+/**
+ * 处理视频详情数据
+ * @param {{
+ *   title: string,
+ *   description: string,
+ *   oid: number,
+ *   view: number,
+ *   danmaku: number,
+ *   reply: number,
+ *   favorite: number,
+ *   coin: number,
+ *   share: number,
+ *   like: number,
+ *   cid: number
+ * }} detail - 视频详情对象
+ * @param {any} data - API返回的数据
+ * @returns {void}
+ */
+export const processVideoDetail = (detail, data) => {
+  detail.title = data.title;
+  detail.description = data.desc;
+  detail.oid = data.aid;
+  detail.view = data.stat.view;
+  detail.danmaku = data.stat.danmaku;
+  detail.reply = data.stat.reply;
+  detail.favorite = data.stat.favorite;
+  detail.coin = data.stat.coin;
+  detail.share = data.stat.share;
+  detail.like = data.stat.like;
+  detail.cid = data.cid;
+  detail.danmaku = data.stat.danmaku;
+};
+
+/**
+ * 获取视频弹幕，当获取到总弹幕数的80%时停止
+ * @param {number} cid - 视频cid
+ * @param {number} totalDanmaku - 视频总弹幕数
+ * @returns {Promise<Array<any>>} - 弹幕数组
+ */
+export const fetchDanmaku = async (cid, totalDanmaku) => {
+  /** @type {Array<any>} */
+  const danmus = [];
+  const targetCount = Math.floor(totalDanmaku * 0.8); // 目标获取80%的弹幕
+  let page = 1;
+
+  try {
+    while (danmus.length < targetCount) {
+      console.log(`正在获取第${page}页弹幕，当前已获取${danmus.length}条，目标${targetCount}条`);
+
+      // 使用已有的fetchBilDanMu函数获取弹幕
+      const pageDanmus = await fetchBilDanMu(cid.toString(), page.toString());
+
+      await delay(800);
+
+      if (!pageDanmus || pageDanmus.length === 0) {
+        console.log(`第${page}页没有弹幕，可能已到达末尾`);
+        break;
+      }
+
+      danmus.push(...pageDanmus);
+      page++;
+
+      // 如果已经获取了足够多的弹幕或者没有更多弹幕，就退出循环
+      if (danmus.length >= targetCount) {
+        console.log(`已获取足够的弹幕(${danmus.length}/${totalDanmaku})，停止获取`);
+        break;
+      }
+    }
+
+    return danmus;
+  } catch (error) {
+    console.error('获取弹幕失败:', error);
+    return danmus; // 返回已获取的弹幕
+  }
+};
+
+/**
+ * 将弹幕数据格式化为文本
+ * @param {Array<any>} danmus - 弹幕数组
+ * @returns {string} - 格式化后的文本
+ */
+export const formatDanmakuToTxt = (danmus) => {
+  return danmus.map(danmu => {
+    const timeStr = formatTime(danmu.time);
+    return `[${timeStr}] ${danmu.content} (发送者: ${danmu.sender}, 类型: ${danmu.type})`;
+  }).join('\n');
+};
+
+/**
+ * 将秒数格式化为时:分:秒格式
+ * @param {number} seconds - 秒数
+ * @returns {string} - 格式化后的时间字符串
+ */
+export const formatTime = (seconds) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
