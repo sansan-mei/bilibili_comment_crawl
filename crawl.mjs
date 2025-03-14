@@ -180,24 +180,11 @@ const crawlBilibiliComments = async () => {
   const outputDir = path.join(__dirname, `${detail.title}-${detail.oid}`);
   ensureDirectoryExists(outputDir);
 
-  fs.writeFileSync(
-    path.join(outputDir, "bilibili_comment.json"),
-    JSON.stringify(comments, null),
-    { encoding: "utf-8" }
-  );
-
   const txtContent = formatCommentsToTxt(comments);
 
   fs.writeFileSync(path.join(outputDir, "bilibili_comment.txt"), txtContent, {
     encoding: "utf-8",
   });
-
-  // 保存弹幕数据
-  fs.writeFileSync(
-    path.join(outputDir, "bilibili_danmaku.json"),
-    JSON.stringify(danmus, null, 2),
-    { encoding: "utf-8" }
-  );
 
   // 将弹幕转换为简单的文本格式
   const danmakuTxtContent = formatDanmakuToTxt(danmus);
