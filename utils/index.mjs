@@ -7,7 +7,7 @@ const root = protobuf.loadSync("./bilibli.proto");
 const DmSegMobileReply = root.lookupType('bilibili.community.service.dm.v1.DmSegMobileReply');
 
 // 延时函数
-export const delay = (ms = 400) => new Promise(resolve => setTimeout(resolve, ms + Math.floor(Math.random() * 200)));
+export const delay = (ms = 400) => new Promise(resolve => setTimeout(resolve, ms + Math.floor(Math.random() * 800)));
 
 /**
  * 生成主评论请求URL
@@ -265,4 +265,14 @@ export const formatTime = (seconds) => {
   const secs = Math.floor(seconds % 60);
 
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
+
+/**
+ * 检查文件是否存在
+ * @param {string} filePath - 文件路径
+ * @returns {boolean} - 文件是否存在
+ */
+export const existFile = (filePath) => {
+  return fs.existsSync(filePath);
 };

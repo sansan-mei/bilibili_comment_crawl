@@ -6,6 +6,7 @@ import UserAgent from "user-agents";
 import {
   delay,
   ensureDirectoryExists,
+  existFile,
   fetchDanmaku,
   formatCommentsToTxt,
   formatDanmakuToTxt,
@@ -96,9 +97,28 @@ const crawlBilibiliComments = async () => {
 
   process.env.OID = detail.oid.toString();
 
+  // 创建以oid命名的目录
+  const outputDir = path.join(__dirname, `${detail.title}-${detail.oid}`);
+  ensureDirectoryExists(outputDir);
+
+  const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");
+
   /** @做一个函数，当读取到的弹幕数量有detail.danmaku的80%时就不读取 */
-  const danmus = await fetchDanmaku(detail.cid, detail.danmaku);
-  console.log(`成功获取${danmus.length}条弹幕，占总弹幕数的${((danmus.length / detail.danmaku) * 100).toFixed(2)}%`);
+  if (!existFile(danmakuFilePath)) {
+    const danmus = await fetchDanmaku(detail.cid, detail.danmaku);
+    console.log(`成功获取${danmus.length}条弹幕，占总弹幕数的${((danmus.length / detail.danmaku) * 100).toFixed(2)}%`);
+
+    // 将弹幕转换为简单的文本格式
+    const danmakuTxtContent = formatDanmakuToTxt(danmus);
+    fs.writeFileSync(
+      danmakuFilePath,
+      danmakuTxtContent,
+      { encoding: "utf-8" }
+    );
+    console.log(`评论和弹幕已保存到目录: ${outputDir}`);
+  } else {
+    console.log(`弹幕已存在，跳过获取弹幕`);
+  }
 
   while (true) {
     try {
@@ -111,6 +131,7 @@ const crawlBilibiliComments = async () => {
       const responseData = response.data;
       const replies = responseData.data.replies;
       if (!responseData.data || !replies) {
+        console.log('没有查询到子评论，跳过')
         continue;
       }
 
@@ -173,32 +194,17 @@ const crawlBilibiliComments = async () => {
 
   console.log(`搜集到${detail.reply}条评论`);
 
-  // 调整代码，将其写成json,同时格式化后再保存
-  // 再保存一份txt的
-
-  // 创建以oid命名的目录
-  const outputDir = path.join(__dirname, `${detail.title}-${detail.oid}`);
-  ensureDirectoryExists(outputDir);
-
   const txtContent = formatCommentsToTxt(comments);
 
   fs.writeFileSync(path.join(outputDir, "bilibili_comment.txt"), txtContent, {
     encoding: "utf-8",
   });
 
-  // 将弹幕转换为简单的文本格式
-  const danmakuTxtContent = formatDanmakuToTxt(danmus);
-  fs.writeFileSync(
-    path.join(outputDir, "bilibili_danmaku.txt"),
-    danmakuTxtContent,
-    { encoding: "utf-8" }
-  );
-
   fs.writeFileSync(path.join(outputDir, "bilibili_detail.json"), JSON.stringify(detail, null, 2), {
     encoding: "utf-8",
   });
 
-  console.log(`评论和弹幕已保存到目录: ${outputDir}`);
+  console.log(`评论已保存到目录: ${outputDir}`);
 };
 
 // 执行爬虫
