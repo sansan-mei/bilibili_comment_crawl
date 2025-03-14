@@ -168,7 +168,7 @@ const crawlBilibiliComments = async () => {
 
   fs.writeFileSync(
     path.join(outputDir, "bilibili_comment.json"),
-    JSON.stringify(comments, null, 2),
+    JSON.stringify(comments, null),
     { encoding: "utf-8" }
   );
 
