@@ -3,6 +3,7 @@ declare namespace NodeJS {
   interface ProcessEnv {
     B_VID: string;
     COOKIES: string;
+    OID: string;
   }
 }
 

@@ -37,6 +37,7 @@ import {
  * @property {number} coin - 视频投币量
  * @property {number} share - 视频分享量
  * @property {number} like - 视频点赞量
+ * @property {number} cid - 读取评论所需要的id
  */
 
 // 获取环境变量，TypeScript 可以正确推断类型
@@ -63,7 +64,21 @@ const crawlBilibiliComments = async () => {
   /** @type {Array<Comment>} */
   const comments = [];
   /** @type {BilibiliDetail} */
-  const detail = {};
+  const detail = {
+    title: "",
+    description: "",
+    duration: "",
+    owner: "",
+    oid: 0,
+    view: 0,
+    reply: 0,
+    favorite: 0,
+    coin: 0,
+    share: 0,
+    like: 0,
+    cid: 0,
+    danmaku: 0,
+  };
   let preCommentLength = 0;
   let i = 0;
 
@@ -73,16 +88,8 @@ const crawlBilibiliComments = async () => {
       headers: header,
     }
   );
-  detail.title = detailResponse.data.title;
-  detail.description = detailResponse.data.desc;
-  detail.oid = detailResponse.data.aid;
-  detail.view = detailResponse.data.stat.view;
-  detail.danmaku = detailResponse.data.stat.danmaku;
-  detail.reply = detailResponse.data.stat.reply;
-  detail.favorite = detailResponse.data.stat.favorite;
-  detail.coin = detailResponse.data.stat.coin;
-  detail.share = detailResponse.data.stat.share;
-  detail.like = detailResponse.data.stat.like;
+
+  processVideoDetail(detail, detailResponse.data);
 
   process.env.OID = detail.oid.toString();
 
@@ -184,6 +191,27 @@ const crawlBilibiliComments = async () => {
 
   console.log(`评论已保存到目录: ${outputDir}`);
 };
+
+/**
+ * 处理视频详情数据
+ * @param {BilibiliDetail} detail - 视频详情对象
+ * @param {any} data - API返回的数据
+ * @returns {void}
+ */
+function processVideoDetail(detail, data) {
+  detail.title = data.title;
+  detail.description = data.desc;
+  detail.oid = data.aid;
+  detail.view = data.stat.view;
+  detail.danmaku = data.stat.danmaku;
+  detail.reply = data.stat.reply;
+  detail.favorite = data.stat.favorite;
+  detail.coin = data.stat.coin;
+  detail.share = data.stat.share;
+  detail.like = data.stat.like;
+  detail.cid = data.cid;
+  detail.danmaku = data.stat.danmaku;
+}
 
 // 执行爬虫
 crawlBilibiliComments().catch((error) => {
