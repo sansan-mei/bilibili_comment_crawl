@@ -300,3 +300,25 @@ export const sanitizeFilename = (filename) => {
   // 替换Windows和大多数文件系统不允许的字符
   return filename.replace(/[\\/:*?"<>|]/g, '_');
 }
+
+
+
+// 获取环境变量，TypeScript 可以正确推断类型
+export const getOid = () => {
+  return process.env.OID;
+}
+
+export const getBVid = () => {
+  /** @https://www.bilibili.com/list/watchlater?bvid=BV1T3QNYaEBL&oid=114155331782990 */
+  // 将BV开头的12位字符提取出来,是任意字符，不是数字
+  const argv2 = process.argv[2]
+  if (argv2?.includes("BV")) {
+    const result = argv2.match(/BV[a-zA-Z0-9]{10}/)?.[0]
+    if (result) {
+      return result
+    } else {
+      throw new Error("BV号格式错误")
+    }
+  }
+  return process.env.B_VID;
+}

@@ -11,7 +11,9 @@ import {
   formatCommentsToTxt,
   formatDanmakuToTxt,
   getBilibiliDetailUrl,
+  getBVid,
   getMainCommentUrl,
+  getOid,
   getReplyUrl,
   mergeTxt,
   processVideoDetail,
@@ -46,14 +48,6 @@ import {
  * @property {number} cid - 读取评论所需要的id
  */
 
-// 获取环境变量，TypeScript 可以正确推断类型
-function getOid() {
-  return process.env.OID;
-}
-
-function getBVid() {
-  return process.argv[2]?.includes("BV") ? process.argv[2] : process.env.B_VID;
-}
 
 const header = {
   "user-agent": new UserAgent().toString(),
@@ -98,6 +92,7 @@ const crawlBilibiliComments = async () => {
   );
 
   processVideoDetail(detail, detailResponse.data);
+  console.log('已获取到视频详情')
 
   process.env.OID = detail.oid.toString();
 
@@ -184,6 +179,7 @@ const crawlBilibiliComments = async () => {
           0
         )}条子评论`
       );
+
 
       // 调整爬虫策略，上一次评论总数和这一次评论总数进行比较，如果有改变说明有新数据，如果没改变说明数据全部搜集完毕，爬虫停止
       if (comments.length === preCommentLength) {
