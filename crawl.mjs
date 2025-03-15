@@ -88,6 +88,7 @@ const crawlBilibiliComments = async () => {
   };
   let preCommentLength = 0;
   let i = 0;
+  let retryCount = 0;
 
   const { data: detailResponse } = await axios.get(
     getBilibiliDetailUrl(getBVid()),
@@ -193,6 +194,14 @@ const crawlBilibiliComments = async () => {
       }
     } catch (error) {
       console.error("请求失败，1秒后重试", error);
+
+      // 添加重试计数器
+      retryCount = (retryCount || 0) + 1;
+      if (retryCount >= 3) {
+        console.log("已重试3次，停止爬取更多评论，开始保存已获取的数据");
+        break;
+      }
+
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
