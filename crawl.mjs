@@ -8,45 +8,16 @@ import {
   ensureDirectoryExists,
   existFile,
   fetchDanmaku,
-  formatCommentsToTxt,
   formatDanmakuToTxt,
   getBilibiliDetailUrl,
   getBVid,
   getMainCommentUrl,
   getOid,
   getReplyUrl,
-  mergeTxt,
   processVideoDetail,
-  sanitizeFilename
+  sanitizeFilename,
+  saveCommentData
 } from "./utils/index.mjs";
-
-/**
- * @typedef {Object} Comment
- * @property {string} content - 评论内容
- * @property {string} author - 评论作者
- * @property {string} sex - 作者性别
- * @property {number} time - 评论时间戳
- * @property {string} rpid - 评论id
- * @property {Array<Comment>}  childList - 子评论列表
- * @property {number} replyCount - 子评论数量
- */
-
-/**
- * @typedef {Object} BilibiliDetail
- * @property {string} title - 视频标题
- * @property {string} description - 视频描述
- * @property {string} duration - 视频时长
- * @property {string} owner - 视频作者
- * @property {number} oid - 视频另一个id
- * @property {number} view - 视频播放量
- * @property {number} danmaku - 视频弹幕量
- * @property {number} reply - 视频评论量
- * @property {number} favorite - 视频收藏量
- * @property {number} coin - 视频投币量
- * @property {number} share - 视频分享量
- * @property {number} like - 视频点赞量
- * @property {number} cid - 读取评论所需要的id
- */
 
 
 const header = {
@@ -62,7 +33,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  * @returns {Promise<void>}
  */
 const crawlBilibiliComments = async () => {
-  /** @type {Array<Comment>} */
+  /** @type {Array<IComment>} */
   const comments = [];
   /** @type {BilibiliDetail} */
   const detail = {
@@ -139,7 +110,7 @@ const crawlBilibiliComments = async () => {
       for (const content of replies) {
         const replyCount = content.rcount;
 
-        /** @type {Comment} */
+        /** @type {IComment} */
         const commentObj = {
           content: content.content.message,
           author: content.member.uname,
@@ -157,9 +128,9 @@ const crawlBilibiliComments = async () => {
               headers: header,
             }
           );
-          /** @type {Array<Comment>} */
+          /** @type {Array<IComment>} */
           const childComments = replyResponse.data.replies.map(
-            /** @param {any} reply */
+            /** @param {AnyObject} reply */
             (reply) => ({
               content: reply.content.message,
               author: reply.member.uname,
@@ -204,23 +175,13 @@ const crawlBilibiliComments = async () => {
 
   console.log(`搜集到${detail.reply}条评论`);
 
-  const txtContent = formatCommentsToTxt(comments);
-
-  fs.writeFileSync(path.join(outputDir, "bilibili_comment.txt"), txtContent, {
-    encoding: "utf-8",
-  });
-
-  fs.writeFileSync(path.join(outputDir, "bilibili_detail.json"), JSON.stringify(detail, null, 2), {
-    encoding: "utf-8",
-  });
-
-  const allTxtContent = mergeTxt(JSON.stringify(detail), txtContent, danmakuTxtContent);
-  fs.writeFileSync(path.join(outputDir, "bilibili_all.txt"), allTxtContent, {
-    encoding: "utf-8",
-  });
+  // 调用封装的函数保存数据
+  await saveCommentData(outputDir, comments, detail, danmakuTxtContent);
 
   console.log(`评论已保存到目录: ${outputDir}`);
 };
+
+
 
 // 执行爬虫
 crawlBilibiliComments().catch((error) => {

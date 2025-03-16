@@ -1,5 +1,6 @@
 // 导入fs模块，用于ensureDirectoryExists函数
 import fs from "fs";
+import path from "path";
 import protobuf from 'protobufjs';
 
 // 初始化protobuf
@@ -322,3 +323,34 @@ export const getBVid = () => {
   }
   return process.env.B_VID;
 }
+
+
+
+/**
+ * 保存评论和相关数据到文件
+ * @param {string} outputDir - 输出目录路径
+ * @param {Array<IComment>} comments - 评论数据
+ * @param {BilibiliDetail} detail - 视频详情
+ * @param {string} danmakuTxtContent - 弹幕内容
+ * @returns {Promise<void>}
+ */
+export const saveCommentData = async (outputDir, comments, detail, danmakuTxtContent) => {
+  // 格式化评论为文本
+  const txtContent = formatCommentsToTxt(comments);
+
+  // 保存评论到文件
+  fs.writeFileSync(path.join(outputDir, "bilibili_comment.txt"), txtContent, {
+    encoding: "utf-8",
+  });
+
+  // 保存视频详情到文件
+  fs.writeFileSync(path.join(outputDir, "bilibili_detail.json"), JSON.stringify(detail, null, 2), {
+    encoding: "utf-8",
+  });
+
+  // 合并所有内容并保存
+  const allTxtContent = mergeTxt(JSON.stringify(detail), txtContent, danmakuTxtContent);
+  fs.writeFileSync(path.join(outputDir, "bilibili_all.txt"), allTxtContent, {
+    encoding: "utf-8",
+  });
+};
