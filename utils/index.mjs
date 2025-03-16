@@ -328,25 +328,36 @@ export const getBVid = () => {
  * @param {Array<IComment>} comments - 评论数据
  * @param {BilibiliDetail} detail - 视频详情
  * @param {string} danmakuTxtContent - 弹幕内容
- * @returns {Promise<void>}
+ * @returns {Promise<{allPath: string, commentPath: string, detailPath: string, danmakuPath: string}>}
  */
 export const saveCommentData = async (outputDir, comments, detail, danmakuTxtContent) => {
+  const allPath = path.join(outputDir, "bilibili_all.txt")
+  const commentPath = path.join(outputDir, "bilibili_comment.txt")
+  const detailPath = path.join(outputDir, "bilibili_detail.json")
+  const danmakuPath = path.join(outputDir, "bilibili_danmaku.txt")
   // 格式化评论为文本
   const txtContent = formatCommentsToTxt(comments);
 
   // 保存评论到文件
-  fs.writeFileSync(path.join(outputDir, "bilibili_comment.txt"), txtContent, {
+  fs.writeFileSync(commentPath, txtContent, {
     encoding: "utf-8",
   });
 
   // 保存视频详情到文件
-  fs.writeFileSync(path.join(outputDir, "bilibili_detail.json"), JSON.stringify(detail, null, 2), {
+  fs.writeFileSync(detailPath, JSON.stringify(detail, null, 2), {
     encoding: "utf-8",
   });
 
   // 合并所有内容并保存
   const allTxtContent = mergeTxt(JSON.stringify(detail), txtContent, danmakuTxtContent);
-  fs.writeFileSync(path.join(outputDir, "bilibili_all.txt"), allTxtContent, {
+  fs.writeFileSync(allPath, allTxtContent, {
     encoding: "utf-8",
   });
+
+  return {
+    allPath,
+    commentPath,
+    detailPath,
+    danmakuPath
+  }
 };

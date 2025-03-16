@@ -1,3 +1,4 @@
+import browser from "#utils/browser";
 import {
   delay,
   ensureDirectoryExists,
@@ -191,9 +192,11 @@ const crawlBilibiliComments = async () => {
   console.log(`搜集到${comments.length}条主评论，共计${comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)}条评论（包括子评论）`);
 
   // 调用封装的函数保存数据
-  await saveCommentData(outputDir, comments, detail, danmakuTxtContent);
+  const { allPath } = await saveCommentData(outputDir, comments, detail, danmakuTxtContent);
 
   console.log(`评论已保存到目录: ${outputDir}`);
+
+  await browser.run(allPath)
 };
 
 
