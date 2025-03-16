@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { connect, launch } from 'puppeteer-core';
 import { fileURLToPath } from 'url';
+import { delay } from './index.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -122,9 +123,15 @@ class Browser {
 
   async clickSubmit() {
     const page = await this.checkPage();
-    await page.click('button[type="submit"]');
+    await page.bringToFront();
+    await delay()
+    const submitButton = await page.waitForSelector('button[type="submit"]', { timeout: 5000 });
+    if (!submitButton) {
+      throw new Error('提交按钮未找到')
+    }
+    await submitButton.click();
     console.log('成功点击提交按钮')
-    await this.browser?.close()
+    this.browser?.disconnect()
   }
 
   /** @param {string} filePath */
