@@ -1,11 +1,7 @@
 // 导入fs模块，用于ensureDirectoryExists函数
+import { DmSegMobileReply } from "#export/index";
 import fs from "fs";
 import path from "path";
-import protobuf from 'protobufjs';
-
-// 初始化protobuf
-const root = protobuf.loadSync("./bilibli.proto");
-const DmSegMobileReply = root.lookupType('bilibili.community.service.dm.v1.DmSegMobileReply');
 
 // 延时函数
 export const delay = (ms = 400) => new Promise(resolve => setTimeout(resolve, ms + Math.floor(Math.random() * 800)));

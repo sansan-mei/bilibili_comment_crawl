@@ -1,8 +1,3 @@
-import axios from "axios";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import UserAgent from "user-agents";
 import {
   delay,
   ensureDirectoryExists,
@@ -17,8 +12,12 @@ import {
   processVideoDetail,
   sanitizeFilename,
   saveCommentData
-} from "./utils/index.mjs";
-
+} from "#utils/index";
+import axios from "axios";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import UserAgent from "user-agents";
 
 const header = {
   "user-agent": new UserAgent().toString(),

@@ -15,5 +15,9 @@
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@types/user-agents": "^1.0.4"
+  },
+  "imports": {
+    "#export/*": "./export/*.mjs",
+    "#utils/*": "./utils/*.mjs"
   }
 }
