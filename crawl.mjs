@@ -91,6 +91,10 @@ const crawlBilibiliComments = async () => {
     console.log(`弹幕已存在，跳过获取弹幕`);
   }
 
+  // 计算目标评论数量（90%的总评论数）
+  const targetCommentCount = Math.floor(detail.reply * 0.9);
+  console.log(`目标获取评论数: ${targetCommentCount}条（总评论数的90%）`);
+
   while (true) {
     try {
       const response = await axios.get(getMainCommentUrl(i, getOid()), {
@@ -143,13 +147,25 @@ const crawlBilibiliComments = async () => {
         comments.push(commentObj);
       }
 
-      console.log(
-        `搜集到${comments.reduce(
-          (acc, cur) => acc + cur.replyCount,
-          0
-        )}条子评论`
+      const totalChildComments = comments.reduce(
+        (acc, cur) => acc + cur.replyCount,
+        0
       );
 
+      console.log(
+        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${comments.length + totalChildComments}条评论`
+      );
+
+      // 检查是否已达到目标评论数量（90%）
+      const currentTotalComments = comments.length + comments.reduce(
+        (acc, cur) => acc + cur.replyCount,
+        0
+      );
+
+      if (currentTotalComments >= targetCommentCount) {
+        console.log(`已达到目标评论数量（${currentTotalComments}/${detail.reply}，${((currentTotalComments / detail.reply) * 100).toFixed(2)}%），停止爬取`);
+        break;
+      }
 
       // 调整爬虫策略，上一次评论总数和这一次评论总数进行比较，如果有改变说明有新数据，如果没改变说明数据全部搜集完毕，爬虫停止
       if (comments.length === preCommentLength) {
@@ -172,7 +188,7 @@ const crawlBilibiliComments = async () => {
     }
   }
 
-  console.log(`搜集到${detail.reply}条评论`);
+  console.log(`搜集到${comments.length}条主评论，共计${comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)}条评论（包括子评论）`);
 
   // 调用封装的函数保存数据
   await saveCommentData(outputDir, comments, detail, danmakuTxtContent);
