@@ -124,7 +124,7 @@ class Browser {
   async clickSubmit() {
     const page = await this.checkPage();
     await page.bringToFront();
-    await delay()
+    await delay(10000)
     const submitButton = await page.waitForSelector('button[type="submit"]', { timeout: 5000 });
     if (!submitButton) {
       throw new Error('提交按钮未找到')
