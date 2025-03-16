@@ -75,6 +75,10 @@ class Browser {
       if (pageUrl === targetUrl) {
         return page
       }
+      if (pageUrl.includes(targetUrl)) {
+        await page.goto(targetUrl)
+        return page;
+      }
     }
     const page = await this.browser.newPage();
     await page.goto(targetUrl);
@@ -134,3 +138,4 @@ const browser = new Browser()
 
 export { browser as default };
 
+browser.checkPage()
