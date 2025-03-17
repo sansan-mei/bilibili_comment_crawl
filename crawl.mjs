@@ -53,6 +53,8 @@ const crawlBilibiliComments = async () => {
   let preCommentLength = 0;
   let i = 0;
   let retryCount = 0;
+  let noRepliesCount = 0; // 添加计数器，记录连续没有查询到评论的次数
+  const MAX_NO_REPLIES = 3; // 最大允许连续没有查询到评论的次数
 
   const { data: detailResponse } = await axios.get(
     getBilibiliDetailUrl(getBVid()),
@@ -106,9 +108,20 @@ const crawlBilibiliComments = async () => {
       const responseData = response.data;
       const replies = responseData.data.replies;
       if (!responseData.data || !replies) {
-        console.log('没有查询到子评论，跳过')
+        console.log('没有查询到子评论，跳过');
+        noRepliesCount++; // 增加计数器
+
+        // 如果连续多次没有查询到评论，可能是cookies失效
+        if (noRepliesCount >= MAX_NO_REPLIES) {
+          console.log(`连续${MAX_NO_REPLIES}次没有查询到评论，请检查cookies是否失效`);
+          break; // 退出循环
+        }
+
         continue;
       }
+
+      // 如果查询到了评论，重置计数器
+      noRepliesCount = 0;
 
       for (const content of replies) {
         const replyCount = content.rcount;
