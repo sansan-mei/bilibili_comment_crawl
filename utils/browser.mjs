@@ -29,7 +29,7 @@ async function connectBrowser() {
         '--disable-setuid-sandbox',
         '--remote-debugging-port=9222'  // 添加远程调试端口
       ],
-      executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+      executablePath: process.env.executablePath
     });
 
     return browser;

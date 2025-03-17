@@ -19,5 +19,8 @@
   "imports": {
     "#export/*": "./export/*.mjs",
     "#utils/*": "./utils/*.mjs"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

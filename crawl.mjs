@@ -1,4 +1,3 @@
-import browser from "#utils/browser";
 import {
   delay,
   ensureDirectoryExists,
@@ -196,7 +195,10 @@ const crawlBilibiliComments = async () => {
 
   console.log(`评论已保存到目录: ${outputDir}`);
 
-  await browser.run(allPath)
+  if (process.env.executablePath) {
+    const browser = (await import('#utils/browser')).default
+    await browser.run(allPath)
+  }
 };
 
 

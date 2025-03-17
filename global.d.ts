@@ -4,6 +4,7 @@ declare namespace NodeJS {
     B_VID: string;
     COOKIES: string;
     OID: string;
+    executablePath: string;
   }
 }
 
