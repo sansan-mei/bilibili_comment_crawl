@@ -215,7 +215,7 @@ export const fetchDanmaku = async (cid, totalDanmaku) => {
       // 使用已有的fetchBilDanMu函数获取弹幕
       const pageDanmus = await fetchBilDanMu(cid.toString(), page.toString());
 
-      await delay(800);
+      await delay(1000);
 
       if (!pageDanmus || pageDanmus.length === 0) {
         console.log(`第${page}页没有弹幕，可能已到达末尾`);
