@@ -91,6 +91,7 @@ const crawlBilibiliComments = async () => {
     console.log(`评论和弹幕已保存到目录: ${outputDir}`);
   } else {
     console.log(`弹幕已存在，跳过获取弹幕`);
+    danmakuTxtContent = fs.readFileSync(danmakuFilePath, { encoding: "utf-8" });
   }
 
   // 计算目标评论数量（90%的总评论数）
