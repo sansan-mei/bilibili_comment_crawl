@@ -64,6 +64,7 @@ Then edit the `.env` file and set the following parameters:
 ```
 COOKIES=your_browser_cookies_here
 B_VID=video_bvid
+EXECUTABLE_PATH=browser_executable_path (optional, for custom browser path)
 ```
 
 Steps to get cookies:
@@ -103,6 +104,7 @@ After crawling is complete, the program will create a folder named after the vid
 - If a request fails, the program will automatically retry up to 3 times
 - Please set a reasonable crawling frequency to avoid putting too much pressure on Bilibili's servers
 - Please comply with Bilibili's user agreement and relevant laws and regulations
+- If you encounter browser-related issues, you can set the `EXECUTABLE_PATH` environment variable to specify a custom browser path
 
 ## Disclaimer
 

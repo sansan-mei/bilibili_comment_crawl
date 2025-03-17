@@ -65,7 +65,8 @@ cp .env.example .env
 
 ```
 COOKIES=你的浏览器cookies，f12打开b站的控制台然后随便抓个请求复制request_headers里的cookie
-B_VID=视频的bvid
+B_VID=视频的bvid（可选，可在跑命令时传入）
+EXECUTABLE_PATH=浏览器可执行文件路径（可选，用于自定义浏览器路径）
 ```
 
 获取 Cookie 的步骤：
@@ -105,6 +106,7 @@ yarn dev BV1z5RPYHEoD
 - 如果请求失败，程序会自动重试最多 3 次
 - 请合理设置爬取频率，避免对 bilibili 服务器造成过大压力
 - 请遵守 bilibili 的用户协议和相关法律法规
+- 如果遇到浏览器相关问题，可以通过设置 `EXECUTABLE_PATH` 环境变量指定自定义浏览器路径
 
 ## 免责声明
 
