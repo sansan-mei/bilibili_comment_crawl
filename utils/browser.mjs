@@ -1,10 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { connect, launch } from 'puppeteer-core';
-import { fileURLToPath } from 'url';
+import UserAgent from 'user-agents';
 import { delay } from './index.mjs';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // 尝试连接到已打开的Chrome浏览器
 async function connectBrowser() {
@@ -22,14 +20,86 @@ async function connectBrowser() {
     console.log(String(error));
 
     // 如果连接失败，则启动新的浏览器实例
+    // 处理跨系统路径问题
+    let executablePath = process.env.executablePath;
+    if (executablePath) {
+      // 标准化路径，处理不同系统的路径分隔符
+      executablePath = path.normalize(executablePath);
+    }
+
+    // 启动浏览器实例
     const browser = await launch({
       headless: false,
+      defaultViewport: null, // 使用默认视口大小
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--remote-debugging-port=9222'  // 添加远程调试端口
+        '--remote-debugging-port=9222',
+        '--disable-blink-features=AutomationControlled', // 禁用自动化控制特性
+        '--disable-web-security', // 禁用网页安全策略
+        '--disable-features=IsolateOrigins,site-per-process', // 禁用站点隔离
+        '--disable-site-isolation-trials',
+        '--disable-features=BlockInsecurePrivateNetworkRequests',
+        '--disable-dev-shm-usage', // 禁用/dev/shm使用
+        '--disable-accelerated-2d-canvas', // 禁用加速2D画布
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu', // 禁用GPU硬件加速
+        '--start-maximized', // 最大化窗口
+        new UserAgent().toString()
       ],
-      executablePath: process.env.executablePath
+      executablePath
+    });
+
+    // 为所有页面设置额外的防检测措施
+    browser.on('targetcreated', async (target) => {
+      try {
+        const page = await target.page();
+        if (page) {
+          // 注入脚本以绕过检测
+          await page.evaluateOnNewDocument(() => {
+            // 覆盖navigator.webdriver
+            Object.defineProperty(navigator, 'webdriver', {
+              get: () => false,
+            });
+
+            // 覆盖navigator.plugins
+            Object.defineProperty(navigator, 'plugins', {
+              get: () => [1, 2, 3, 4, 5],
+            });
+
+            // 添加假的chrome对象
+            // @ts-ignore - 忽略类型检查
+            window.chrome = {
+              runtime: {},
+              app: {},
+              loadTimes: () => { },
+              csi: () => { },
+              webstore: {}
+            };
+
+            // 添加语言
+            Object.defineProperty(navigator, 'languages', {
+              get: () => ['zh-CN', 'zh', 'en-US', 'en'],
+            });
+
+            // 修改permissions API
+            if (navigator.permissions) {
+              // @ts-ignore - 忽略类型检查
+              const originalQuery = navigator.permissions.query;
+              // @ts-ignore - 忽略类型检查
+              navigator.permissions.query = (parameters) => {
+                if (parameters.name === 'notifications') {
+                  return Promise.resolve({ state: Notification.permission });
+                }
+                return originalQuery(parameters);
+              };
+            }
+          });
+        }
+      } catch (err) {
+        console.error('设置防检测措施时出错:', String(err));
+      }
     });
 
     return browser;
