@@ -66,7 +66,7 @@ cp .env.example .env
 ```
 COOKIES=你的浏览器cookies，f12打开b站的控制台然后随便抓个请求复制request_headers里的cookie
 B_VID=视频的bvid（可选，可在跑命令时传入）
-EXECUTABLE_PATH=浏览器可执行文件路径（可选，用于自定义浏览器路径）
+EXECUTABLE_PATH=浏览器可执行文件路径（可选，用于自定义浏览器路径,只建议在window上操作）
 ```
 
 获取 Cookie 的步骤：

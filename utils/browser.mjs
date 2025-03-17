@@ -144,5 +144,3 @@ class Browser {
 const browser = new Browser()
 
 export { browser as default };
-
-browser.checkPage()
