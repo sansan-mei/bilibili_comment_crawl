@@ -21,7 +21,7 @@ This is a tool for crawling comments, danmaku (bullet screen comments), and vide
 
 ## Requirements
 
-- Node.js 16+
+- Node.js 20+
 - Valid Bilibili account cookies
 
 ## Installation

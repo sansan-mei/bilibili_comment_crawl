@@ -21,7 +21,7 @@
 
 ## 环境要求
 
-- Node.js 16+
+- Node.js 20+
 - 有效的 bilibili 账号 Cookie
 
 ## 安装步骤
