@@ -305,18 +305,24 @@ export const getOid = () => {
   return process.env.OID;
 }
 
-export const getBVid = () => {
+/**
+ * 获取BV号
+ * @param {string} [arg] - 命令行参数
+ * @returns {string} - BV号
+ */
+export const getBVid = (arg) => {
   /** @https://www.bilibili.com/list/watchlater?bvid=BV1T3QNYaEBL&oid=114155331782990 */
-  // 将BV开头的12位字符提取出来,是任意字符，不是数字
-  const argv2 = process.argv[2]
+  const argv2 = arg || process.argv[2];
   if (argv2?.includes("BV")) {
-    const result = argv2.match(/BV[a-zA-Z0-9]{10}/)?.[0]
+    const result = argv2.match(/BV[a-zA-Z0-9]{10}/)?.[0];
     if (result) {
-      return result
+      return result;
     } else {
-      throw new Error("BV号格式错误")
+      throw new Error("BV号格式错误");
     }
   }
+
+  // 最后尝试从环境变量B_VID获取
   return process.env.B_VID;
 }
 

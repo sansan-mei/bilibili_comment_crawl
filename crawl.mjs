@@ -15,6 +15,7 @@ import {
 } from "#utils/index";
 import axios from "axios";
 import fs from "fs";
+import inquirer from 'inquirer';
 import path from "path";
 import { fileURLToPath } from "url";
 import UserAgent from "user-agents";
@@ -29,9 +30,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * 爬取B站评论
+ * @param {string} [forceBVid] - 强制使用的BV号（可选）
  * @returns {Promise<void>}
  */
-const crawlBilibiliComments = async () => {
+const crawlBilibiliComments = async (forceBVid) => {
   /** @type {Array<IComment>} */
   const comments = [];
   /** @type {BilibiliDetail} */
@@ -56,8 +58,18 @@ const crawlBilibiliComments = async () => {
   let noRepliesCount = 0; // 添加计数器，记录连续没有查询到评论的次数
   const MAX_NO_REPLIES = 3; // 最大允许连续没有查询到评论的次数
 
+  // 使用强制传入的BV号或尝试从环境变量获取
+  const bvid = getBVid(forceBVid);
+
+  if (!bvid) {
+    console.log('未提供有效的BV号，无法爬取视频');
+    return;
+  }
+
+  console.log(`开始爬取视频 ${bvid} 的评论`);
+
   const { data: detailResponse } = await axios.get(
-    getBilibiliDetailUrl(getBVid()),
+    getBilibiliDetailUrl(bvid),
     {
       headers: header,
     }
@@ -217,7 +229,198 @@ const crawlBilibiliComments = async () => {
 
 
 
-// 执行爬虫
-crawlBilibiliComments().catch((error) => {
-  console.error("爬虫执行失败:", error);
+// 主程序入口
+async function main() {
+  const bvid = getBVid();
+  if (bvid) {
+    try {
+      await crawlBilibiliComments(bvid);
+    } catch (error) {
+      console.error("爬虫执行失败:", error);
+    }
+    console.log('\n==================================================');
+    console.log('爬虫任务已完成，现在进入交互模式');
+    console.log('==================================================\n');
+  } else {
+    console.log('\n==================================================');
+    console.log('欢迎使用 Bilibili 评论爬虫');
+    console.log('==================================================\n');
+  }
+
+  // 启动交互式命令行界面
+  startInteractiveMode();
+}
+
+// 执行主程序
+main().catch(error => {
+  console.error("程序运行失败:", error);
 });
+
+/**
+ * 启动交互式命令行模式，使用inquirer库提供更好的用户体验
+ */
+function startInteractiveMode() {
+  promptForAction();
+}
+
+/**
+ * 提示用户选择操作
+ */
+async function promptForAction() {
+  try {
+    const { action } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'action',
+        message: '请选择操作:',
+        choices: [
+          { name: '爬取新视频', value: 'crawl' },
+          { name: '查看已爬取视频列表', value: 'list' },
+          { name: '帮助信息', value: 'help' },
+          { name: '退出程序', value: 'exit' }
+        ],
+        loop: false
+      }
+    ]);
+
+    switch (action) {
+      case 'crawl':
+        await promptForBVid();
+        break;
+      case 'list':
+        await listCrawledVideos();
+        break;
+      case 'help':
+        showHelp();
+        break;
+      case 'exit':
+        console.log('程序已退出');
+        process.exit(0);
+        break;
+    }
+  } catch (error) {
+    console.error('发生错误:', error);
+    promptForAction();
+  }
+}
+
+/**
+ * 提示用户输入BV号
+ */
+async function promptForBVid() {
+  const { bvid } = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'bvid',
+      message: '请输入B站视频BV号:',
+      validate: (input) => {
+        const bvidMatch = input.match(/BV[a-zA-Z0-9]{10}/);
+        if (bvidMatch) {
+          return true;
+        }
+        return 'BV号格式错误，请输入正确的BV号或包含BV号的链接';
+      }
+    }
+  ]);
+
+  // 直接传递BV号给爬虫函数，而不是通过环境变量
+  try {
+    await crawlBilibiliComments(bvid);
+    console.log(`视频 ${bvid} 的评论爬取完成`);
+  } catch (error) {
+    console.error(`爬取视频 ${bvid} 失败:`, error);
+  }
+
+  // 爬取完毕后，继续提示用户选择操作
+  promptForAction();
+}
+
+/**
+ * 列出已爬取的视频
+ */
+async function listCrawledVideos() {
+  // 列出 __dirname 目录下所有以数字结尾的文件夹
+  const dirs = fs.readdirSync(__dirname)
+    .filter(dir => fs.lstatSync(path.join(__dirname, dir)).isDirectory())
+    .filter(dir => /\d+$/.test(dir));
+
+  if (dirs.length === 0) {
+    console.log('\n暂无爬取记录');
+    promptForAction();
+    return;
+  }
+
+  // 格式化显示爬取的视频列表
+  const choices = dirs.map(dir => ({
+    name: dir,
+    value: dir
+  }));
+
+  choices.push({ name: '返回上级菜单', value: 'back' });
+
+  const { selectedDir } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'selectedDir',
+      message: '已爬取的视频列表:',
+      choices: choices
+    }
+  ]);
+
+  if (selectedDir === 'back') {
+    promptForAction();
+    return;
+  }
+
+  // 如果选择了某个视频，可以提供查看该视频详情的选项
+  const { action } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'action',
+      message: `选择对 ${selectedDir} 的操作:`,
+      choices: [
+        { name: '查看视频详情', value: 'view' },
+        { name: '返回列表', value: 'back' }
+      ]
+    }
+  ]);
+
+  if (action === 'view') {
+    try {
+      const detailPath = path.join(__dirname, selectedDir, 'bilibili_detail.json');
+      if (fs.existsSync(detailPath)) {
+        const detailContent = fs.readFileSync(detailPath, { encoding: 'utf-8' });
+        const detail = JSON.parse(detailContent);
+        console.log('\n视频详情:');
+        console.log(`标题: ${detail.title}`);
+        console.log(`观看次数: ${detail.view}`);
+        console.log(`评论数: ${detail.reply}`);
+        console.log(`弹幕数: ${detail.danmaku}`);
+        console.log(`点赞数: ${detail.like}`);
+        console.log(`投币数: ${detail.coin}`);
+        console.log(`收藏数: ${detail.favorite}`);
+        console.log(`分享数: ${detail.share}\n`);
+      } else {
+        console.log('未找到视频详情文件');
+      }
+    } catch (error) {
+      console.error('读取视频详情失败:', error);
+    }
+  }
+
+  // 返回视频列表
+  listCrawledVideos();
+}
+
+/**
+ * 显示帮助信息
+ */
+function showHelp() {
+  console.log('\n帮助信息:');
+  console.log('1. 爬取新视频 - 输入B站视频BV号，爬取视频评论和弹幕');
+  console.log('2. 查看已爬取视频列表 - 显示已爬取的视频列表，可以查看详情');
+  console.log('3. 帮助信息 - 显示本帮助信息');
+  console.log('4. 退出程序 - 退出爬虫程序\n');
+
+  promptForAction();
+}
