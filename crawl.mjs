@@ -76,7 +76,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   );
 
   processVideoDetail(detail, detailResponse.data);
-  console.log('已获取到视频详情' + detail.title)
+  console.log(`已获取到视频详情：【${detail.title}】\n`)
 
   process.env.OID = detail.oid.toString();
 
