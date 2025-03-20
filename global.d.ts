@@ -21,6 +21,7 @@ declare type IComment = {
   rpid: string;
   childList: Array<IComment>;
   replyCount: number;
+  like: number;
 };
 
 declare type BilibiliDetail = {

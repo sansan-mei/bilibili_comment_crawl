@@ -148,6 +148,7 @@ const crawlBilibiliComments = async (forceBVid) => {
           rpid: content.rpid,
           childList: [],
           replyCount,
+          like: content.like,
         };
         if (replyCount > 0) {
           await delay();
@@ -166,6 +167,7 @@ const crawlBilibiliComments = async (forceBVid) => {
               sex: reply.member.sex,
               time: reply.ctime,
               rpid: reply.rpid,
+              like: reply.like,
             })
           );
           commentObj.childList = childComments;
