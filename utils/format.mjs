@@ -3,20 +3,20 @@ import { formatTime } from './utils.mjs';
 
 /**
  * 格式化评论为TXT内容
- * @param {AnyArray} comments - 评论数组
+ * @param {IComment[]} comments - 评论数组
  * @returns {string} 格式化后的TXT内容
  */
 export const formatCommentsToTxt = (comments) => {
   return comments
     .map((c) => {
       // 主评论
-      let commentText = `${c.author}：${c.sex}：${c.time}：${c.content}`;
+      let commentText = `${c.author}：${c.sex}：${c.time}：${c.content}：${c.like}：${c.replyCount}`;
 
       // 添加子评论（如果有）
       if (c.childList && c.childList.length > 0) {
         const childComments = c.childList
           // @ts-ignore
-          .map(child => `  └─ ${child.author}：${child.sex}：${child.time}：${child.content}`)
+          .map(child => `  └─ ${child.author}：${child.sex}：${child.time}：${child.content}：${child.like}：${child.replyCount}`)
           .join("\n");
         commentText += "\n" + childComments;
       }
