@@ -10,13 +10,13 @@ export const formatCommentsToTxt = (comments) => {
   return comments
     .map((c) => {
       // 主评论
-      let commentText = `${c.author}：${c.sex}：${c.time}：${c.content}：${c.like}：${c.replyCount}`;
+      let commentText = `${c.author}：${c.sex}：时间-${c.time}：内容-${c.content}：点赞-${c.like}：回复-${c.replyCount}`;
 
       // 添加子评论（如果有）
       if (c.childList && c.childList.length > 0) {
         const childComments = c.childList
           // @ts-ignore
-          .map(child => `  └─ ${child.author}：${child.sex}：${child.time}：${child.content}：${child.like}：${child.replyCount}`)
+          .map(child => `  └─ ${child.author}：${child.sex}：时间-${child.time}：内容-${child.content}：点赞-${child.like}`)
           .join("\n");
         commentText += "\n" + childComments;
       }

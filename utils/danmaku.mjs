@@ -38,20 +38,23 @@ export const decodeDanMu = (buffer) => {
   try {
     const decoded = DmSegMobileReply.decode(new Uint8Array(buffer));
     // @ts-ignore - 忽略elems属性不存在的错误
-    return decoded.elems.map((dm) => ({
-      id: dm.idStr || dm.id.toString(),
-      time: dm.progress / 1000, // 转换为秒
-      content: dm.content,
-      type: parseMode(dm.mode),
-      sender: dm.midHash,
-      sendTime: parseTime(dm.ctime),
-      pool: ["普通池", "字幕池", "特殊池"][dm.pool] || "未知",
-      attributes: {
-        protected: !!(dm.attr & 1),
-        live: !!(dm.attr & 2),
-        highLike: !!(dm.attr & 4),
-      },
-    }));
+    return decoded.elems.map((dm) => {
+      debugger
+      return {
+        id: dm.idStr || dm.id.toString(),
+        time: dm.progress / 1000, // 转换为秒
+        content: dm.content,
+        type: parseMode(dm.mode),
+        sender: dm.midHash,
+        sendTime: parseTime(dm.ctime),
+        pool: ["普通池", "字幕池", "特殊池"][dm.pool] || "未知",
+        attributes: {
+          protected: !!(dm.attr & 1),
+          live: !!(dm.attr & 2),
+          highLike: !!(dm.attr & 4),
+        },
+      }
+    });
   } catch (err) {
     console.error("解码失败:", err);
     throw new Error("弹幕数据解析失败");
