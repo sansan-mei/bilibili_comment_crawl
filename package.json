@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "Bilibili comment crawler in JS",
   "scripts": {
-    "dev": "node --env-file=.env crawl.mjs"
+    "dev": "node --env-file=.env --watch crawl.mjs"
   },
   "type": "module",
   "dependencies": {
+    "@hapi/hapi": "^21.4.0",
     "axios": "^1.6.2",
     "inquirer": "^12.5.0",
     "protobufjs": "^7.4.0",

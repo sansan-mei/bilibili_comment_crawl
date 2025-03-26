@@ -17,3 +17,6 @@ export * from "./cli.mjs";
 
 // 导出通用工具函数
 export * from "./utils.mjs";
+
+// 导出Hapi服务器
+export * from "./server.mjs";

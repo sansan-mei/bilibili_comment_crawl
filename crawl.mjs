@@ -9,10 +9,11 @@ import {
   getMainCommentUrl,
   getOid,
   getReplyUrl,
+  logStart,
   processVideoDetail,
   sanitizeFilename,
   saveCommentData,
-  startInteractiveMode
+  startInteractiveMode,
 } from "#utils/index";
 import axios from "axios";
 import fs from "fs";
@@ -26,7 +27,6 @@ const header = {
 };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 
 /**
  * 爬取B站评论
@@ -62,21 +62,18 @@ const crawlBilibiliComments = async (forceBVid) => {
   const bvid = getBVid(forceBVid);
 
   if (!bvid) {
-    console.log('未提供有效的BV号，无法爬取视频');
+    console.log("未提供有效的BV号，无法爬取视频");
     return;
   }
 
   console.log(`开始爬取视频 ${bvid} 的评论`);
 
-  const { data: detailResponse } = await axios.get(
-    getBilibiliDetailUrl(bvid),
-    {
-      headers: header,
-    }
-  );
+  const { data: detailResponse } = await axios.get(getBilibiliDetailUrl(bvid), {
+    headers: header,
+  });
 
   processVideoDetail(detail, detailResponse.data);
-  console.log(`已获取到视频详情：【${detail.title}】\n`)
+  console.log(`已获取到视频详情：【${detail.title}】\n`);
 
   process.env.OID = detail.oid.toString();
 
@@ -86,20 +83,21 @@ const crawlBilibiliComments = async (forceBVid) => {
   ensureDirectoryExists(outputDir);
 
   const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");
-  let danmakuTxtContent = ''
+  let danmakuTxtContent = "";
 
   /** @做一个函数，当读取到的弹幕数量有detail.danmaku的80%时就不读取 */
   if (!existFile(danmakuFilePath)) {
     const danmus = await fetchDanmaku(detail.cid, detail.danmaku);
-    console.log(`成功获取${danmus.length}条弹幕，占总弹幕数的${((danmus.length / detail.danmaku) * 100).toFixed(2)}%`);
+    console.log(
+      `成功获取${danmus.length}条弹幕，占总弹幕数的${(
+        (danmus.length / detail.danmaku) *
+        100
+      ).toFixed(2)}%`
+    );
 
     // 将弹幕转换为简单的文本格式
     danmakuTxtContent = formatDanmakuToTxt(danmus);
-    fs.writeFileSync(
-      danmakuFilePath,
-      danmakuTxtContent,
-      { encoding: "utf-8" }
-    );
+    fs.writeFileSync(danmakuFilePath, danmakuTxtContent, { encoding: "utf-8" });
     console.log(`评论和弹幕已保存到目录: ${outputDir}`);
   } else {
     console.log(`弹幕已存在，跳过获取弹幕`);
@@ -121,12 +119,14 @@ const crawlBilibiliComments = async (forceBVid) => {
       const responseData = response.data;
       const replies = responseData.data.replies;
       if (!responseData.data || !replies) {
-        console.log('没有查询到子评论，跳过');
+        console.log("没有查询到子评论，跳过");
         noRepliesCount++; // 增加计数器
 
         // 如果连续多次没有查询到评论，可能是cookies失效
         if (noRepliesCount >= MAX_NO_REPLIES) {
-          console.log(`连续${MAX_NO_REPLIES}次没有查询到评论，请检查cookies是否失效`);
+          console.log(
+            `连续${MAX_NO_REPLIES}次没有查询到评论，请检查cookies是否失效`
+          );
           break; // 退出循环
         }
 
@@ -181,17 +181,23 @@ const crawlBilibiliComments = async (forceBVid) => {
       );
 
       console.log(
-        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${comments.length + totalChildComments}条评论`
+        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${
+          comments.length + totalChildComments
+        }条评论`
       );
 
       // 检查是否已达到目标评论数量（90%）
-      const currentTotalComments = comments.length + comments.reduce(
-        (acc, cur) => acc + cur.replyCount,
-        0
-      );
+      const currentTotalComments =
+        comments.length +
+        comments.reduce((acc, cur) => acc + cur.replyCount, 0);
 
       if (currentTotalComments >= targetCommentCount) {
-        console.log(`已达到目标评论数量（${currentTotalComments}/${detail.reply}，${((currentTotalComments / detail.reply) * 100).toFixed(2)}%），停止爬取`);
+        console.log(
+          `已达到目标评论数量（${currentTotalComments}/${detail.reply}，${(
+            (currentTotalComments / detail.reply) *
+            100
+          ).toFixed(2)}%），停止爬取`
+        );
         break;
       }
 
@@ -216,20 +222,27 @@ const crawlBilibiliComments = async (forceBVid) => {
     }
   }
 
-  console.log(`搜集到${comments.length}条主评论，共计${comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)}条评论（包括子评论）`);
+  console.log(
+    `搜集到${comments.length}条主评论，共计${
+      comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
+    }条评论（包括子评论）`
+  );
 
   // 调用封装的函数保存数据
-  const { allPath } = await saveCommentData(outputDir, comments, detail, danmakuTxtContent);
+  const { allPath } = await saveCommentData(
+    outputDir,
+    comments,
+    detail,
+    danmakuTxtContent
+  );
 
   console.log(`评论已保存到目录: ${outputDir}`);
 
   if (process.env.executablePath) {
-    const browser = (await import('#utils/browser')).default
-    await browser.run(allPath)
+    const browser = (await import("#utils/browser")).default;
+    await browser.run(allPath);
   }
 };
-
-
 
 // 主程序入口
 async function main() {
@@ -240,21 +253,24 @@ async function main() {
     } catch (error) {
       console.error("爬虫执行失败:", error);
     }
-    console.log('\n==================================================');
-    console.log('爬虫任务已完成，现在进入交互模式');
-    console.log('==================================================\n');
+    console.log("\n==================================================");
+    console.log("爬虫任务已完成，现在进入交互模式");
+    console.log("==================================================\n");
   } else {
-    console.log('\n==================================================');
-    console.log('欢迎使用 Bilibili 评论爬虫');
-    console.log('==================================================\n');
+    console.log("\n==================================================");
+    console.log("欢迎使用 Bilibili 评论爬虫");
+    console.log("==================================================\n");
   }
 
   // 启动交互式命令行界面
   startInteractiveMode();
+
+  // 启动Hapi服务器
+  logStart(crawlBilibiliComments);
 }
 
 // 执行主程序
-main().catch(error => {
+main().catch((error) => {
   console.error("程序运行失败:", error);
 });
 
