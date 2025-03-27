@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Bilibili comment crawler in JS",
   "scripts": {
-    "dev": "node --env-file=.env --watch crawl.mjs"
+    "dev": "node --env-file=.env crawl.mjs"
   },
   "type": "module",
   "dependencies": {
