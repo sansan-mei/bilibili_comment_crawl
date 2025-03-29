@@ -2,8 +2,12 @@
   "name": "bilibili-comment-crawler",
   "version": "1.0.0",
   "description": "Bilibili comment crawler in JS",
+  "bin": {
+    "bil-crawl": "./crawl.mjs"
+  },
   "scripts": {
-    "dev": "node --env-file=.env crawl.mjs"
+    "dev": "node --env-file=.env crawl.mjs",
+    "start": "node --env-file=.env crawl.mjs"
   },
   "type": "module",
   "dependencies": {
