@@ -25,13 +25,12 @@ app.route({
  * 启动Hapi服务器
  * @param {Function} _handle - 启动成功后的回调函数
  */
-function logStart(_handle) {
-  app.start().then(() => {
-    console.log("\n==================================================");
-    console.log("Hapi服务器启动成功");
-    console.log("==================================================\n");
-    handle = _handle;
-  });
+async function logStart(_handle) {
+  await app.start();
+  console.log("\n==================================================");
+  console.log("Hapi服务器启动成功");
+  console.log("==================================================\n");
+  handle = _handle;
 }
 
 const httpServer = app;

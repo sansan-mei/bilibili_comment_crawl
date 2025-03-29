@@ -264,11 +264,10 @@ async function main() {
     console.log("==================================================\n");
   }
 
+  // 启动Hapi服务器
+  await logStart(crawlBilibiliComments);
   // 启动交互式命令行界面
   startInteractiveMode();
-
-  // 启动Hapi服务器
-  logStart(crawlBilibiliComments);
 }
 
 // 执行主程序
