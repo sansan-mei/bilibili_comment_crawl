@@ -30,12 +30,22 @@ const header = {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/** @type {Map<string,'running' | 'ready'>} */
+const queue = new Map();
+
 /**
  * 爬取B站评论
  * @param {string} [forceBVid] - 强制使用的BV号（可选）
  * @returns {Promise<void>}
  */
 const crawlBilibiliComments = async (forceBVid) => {
+  /** @如果有正在运行的，那就推到map然后等运行完再 */
+  const taskList = [...queue.values()];
+  if (taskList.includes("running") && forceBVid) {
+    !queue.has(forceBVid) && queue.set(forceBVid, "ready");
+    return;
+  }
+
   /** @type {Array<IComment>} */
   const comments = [];
   /** @type {BilibiliDetail} */
@@ -68,6 +78,7 @@ const crawlBilibiliComments = async (forceBVid) => {
     return;
   }
 
+  queue.set(bvid, "running");
   console.log(`开始爬取视频 ${bvid} 的评论`);
 
   const { data: detailResponse } = await axios.get(getBilibiliDetailUrl(bvid), {
@@ -243,6 +254,16 @@ const crawlBilibiliComments = async (forceBVid) => {
   if (process.env.executablePath) {
     const browser = (await import("#utils/browser")).default;
     await browser.run(allPath);
+  }
+
+  queue.delete(bvid);
+  // 检查队列中是否有待执行的任务
+  for (const [nextBVid, status] of queue.entries()) {
+    if (status === "ready") {
+      console.log(`\n开始执行队列中的下一个任务: ${nextBVid}`);
+      await crawlBilibiliComments(nextBVid);
+      break;
+    }
   }
 };
 
