@@ -70,7 +70,9 @@ const crawlBilibiliComments = async (forceBVid) => {
   /** @如果有正在运行的，那就推到map然后等运行完再 */
   const taskList = [...queue.values()];
   if (taskList.includes("running") && forceBVid) {
-    !queue.has(bvid) && queue.set(bvid, "ready");
+    !queue.has(bvid) &&
+      queue.set(bvid, "ready") &&
+      console.log("\n检测到任务进入队列");
     return;
   }
 
