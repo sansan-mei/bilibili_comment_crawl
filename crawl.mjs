@@ -2,11 +2,13 @@
 
 import {
   delay,
+  downloadVideo,
   ensureDirectoryExists,
   existFile,
   fetchDanmaku,
   formatDanmakuToTxt,
   getBilibiliDetailUrl,
+  getBilibiliVideoStreamUrl,
   getBVid,
   getMainCommentUrl,
   getOid,
@@ -18,7 +20,6 @@ import {
   startInteractiveMode,
 } from "#utils/index";
 import axios from "axios";
-import console from "console";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -27,6 +28,8 @@ import UserAgent from "user-agents";
 const header = {
   "user-agent": new UserAgent().toString(),
   cookie: process.env.COOKIES,
+  referer: "https://www.bilibili.com/",
+  origin: "https://www.bilibili.com/",
 };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -97,6 +100,30 @@ const crawlBilibiliComments = async (forceBVid) => {
   const sanitizedTitle = sanitizeFilename(detail.title);
   const outputDir = path.join(__dirname, `${sanitizedTitle}-${detail.oid}`);
   ensureDirectoryExists(outputDir);
+
+  const videoInfoUrl = getBilibiliVideoStreamUrl(bvid, detail.cid);
+  console.log(`已获取到视频流URL：${videoInfoUrl}`);
+
+  if (process.env.IS_FETCH_VIDEO_STREAM === "1") {
+    /** @type {{data:BilibiliVideoInfo}} */
+    const { data: videoInfoResponse } = await axios.get(videoInfoUrl, {
+      headers: header,
+    });
+    // 这是一个mp4视频流地址，需要下载并将音频提取出来转文本？有什么简单的方式？
+
+    const videoPath = path.join(
+      __dirname,
+      `${sanitizedTitle}-${detail.oid}.mp4`
+    );
+    const audioPath = path.join(
+      __dirname,
+      `${sanitizedTitle}-${detail.oid}.mp3`
+    );
+
+    const videoUrl = videoInfoResponse.data.durl?.[0]?.url;
+    await downloadVideo(videoUrl, videoPath, header);
+    console.log(`视频下载完成并保存到: ${videoPath}`);
+  }
 
   const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");
   let danmakuTxtContent = "";

@@ -30,22 +30,12 @@ export const getBilibiliDetailUrl = (b_vid) => {
 };
 
 /**
- * 处理视频详情数据
- * @param {BilibiliDetail} detail - 视频详情对象
- * @param {any} data - API返回的数据
- * @returns {void}
+ * 获取B站视频流URL (最低清晰度)
+ * @param {string|number} bvid - B站视频BV号
+ * @param {string|number} cid - 视频分P的ID
+ * @returns {string} 获取视频流URL的API地址
  */
-export const processVideoDetail = (detail, data) => {
-  detail.title = data.title;
-  detail.description = data.desc;
-  detail.oid = data.aid;
-  detail.view = data.stat.view;
-  detail.danmaku = data.stat.danmaku;
-  detail.reply = data.stat.reply;
-  detail.favorite = data.stat.favorite;
-  detail.coin = data.stat.coin;
-  detail.share = data.stat.share;
-  detail.like = data.stat.like;
-  detail.cid = data.cid;
-  detail.danmaku = data.stat.danmaku;
+export const getBilibiliVideoStreamUrl = (bvid, cid) => {
+  // 添加platform=html5参数绕过防盗链验证
+  return `https://api.bilibili.com/x/player/playurl?bvid=${bvid}&cid=${cid}&qn=6&fnval=1&platform=html5`;
 };

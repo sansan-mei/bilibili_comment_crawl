@@ -39,7 +39,6 @@ export const decodeDanMu = (buffer) => {
     const decoded = DmSegMobileReply.decode(new Uint8Array(buffer));
     // @ts-ignore - 忽略elems属性不存在的错误
     return decoded.elems.map((dm) => {
-      debugger
       return {
         id: dm.idStr || dm.id.toString(),
         time: dm.progress / 1000, // 转换为秒
@@ -53,7 +52,7 @@ export const decodeDanMu = (buffer) => {
           live: !!(dm.attr & 2),
           highLike: !!(dm.attr & 4),
         },
-      }
+      };
     });
   } catch (err) {
     console.error("解码失败:", err);

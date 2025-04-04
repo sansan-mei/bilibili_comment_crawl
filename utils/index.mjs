@@ -20,3 +20,6 @@ export * from "./utils.mjs";
 
 // 导出Hapi服务器
 export * from "./server.mjs";
+
+// 导出FFmpeg相关函数
+export * from "./ffmpeg.mjs";

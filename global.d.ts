@@ -5,6 +5,7 @@ declare namespace NodeJS {
     COOKIES: string;
     OID: string;
     executablePath: string;
+    IS_FETCH_VIDEO_STREAM: string;
   }
 }
 
@@ -38,4 +39,12 @@ declare type BilibiliDetail = {
   share: number;
   like: number;
   cid: number;
+};
+
+declare type BilibiliVideoInfo = {
+  data: {
+    durl: Array<{
+      url: string;
+    }>;
+  };
 };
