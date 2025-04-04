@@ -18,6 +18,7 @@ import {
   startInteractiveMode,
 } from "#utils/index";
 import axios from "axios";
+import console from "console";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -39,12 +40,8 @@ const queue = new Map();
  * @returns {Promise<void>}
  */
 const crawlBilibiliComments = async (forceBVid) => {
-  /** @如果有正在运行的，那就推到map然后等运行完再 */
-  const taskList = [...queue.values()];
-  if (taskList.includes("running") && forceBVid) {
-    !queue.has(forceBVid) && queue.set(forceBVid, "ready");
-    return;
-  }
+  // 使用强制传入的BV号或尝试从环境变量获取
+  const bvid = getBVid(forceBVid);
 
   /** @type {Array<IComment>} */
   const comments = [];
@@ -70,8 +67,12 @@ const crawlBilibiliComments = async (forceBVid) => {
   let noRepliesCount = 0; // 添加计数器，记录连续没有查询到评论的次数
   const MAX_NO_REPLIES = 3; // 最大允许连续没有查询到评论的次数
 
-  // 使用强制传入的BV号或尝试从环境变量获取
-  const bvid = getBVid(forceBVid);
+  /** @如果有正在运行的，那就推到map然后等运行完再 */
+  const taskList = [...queue.values()];
+  if (taskList.includes("running") && forceBVid) {
+    !queue.has(bvid) && queue.set(bvid, "ready");
+    return;
+  }
 
   if (!bvid) {
     console.log("未提供有效的BV号，无法爬取视频");
