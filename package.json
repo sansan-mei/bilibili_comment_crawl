@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "node --env-file=.env crawl.mjs",
-    "start": "node --env-file=.env crawl.mjs"
+    "start": "bun run crawl.mjs"
   },
   "type": "module",
   "dependencies": {
