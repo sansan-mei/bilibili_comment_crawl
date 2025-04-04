@@ -5,6 +5,7 @@ import {
   downloadVideo,
   ensureDirectoryExists,
   existFile,
+  extractAudio,
   fetchDanmaku,
   formatDanmakuToTxt,
   getBilibiliDetailUrl,
@@ -111,18 +112,31 @@ const crawlBilibiliComments = async (forceBVid) => {
     });
     // 这是一个mp4视频流地址，需要下载并将音频提取出来转文本？有什么简单的方式？
 
-    const videoPath = path.join(
-      __dirname,
-      `${sanitizedTitle}-${detail.oid}.mp4`
-    );
-    const audioPath = path.join(
-      __dirname,
-      `${sanitizedTitle}-${detail.oid}.mp3`
-    );
+    const videoPath = path.join(outputDir, `current.mp4`);
+    const audioPath = path.join(outputDir, `current.mp3`);
 
     const videoUrl = videoInfoResponse.data.durl?.[0]?.url;
-    await downloadVideo(videoUrl, videoPath, header);
-    console.log(`视频下载完成并保存到: ${videoPath}`);
+    // 如果视频已经有了，那就跳过
+    if (existFile(videoPath) && existFile(audioPath)) {
+      console.log(`资源已存在，跳过下载`);
+    } else if (existFile(videoPath)) {
+      downloadVideo(videoUrl, videoPath, header).then(() => {
+        console.log("\n=====================------");
+        console.log(`视频下载完成并保存到: ${videoPath}`);
+        console.log("====================------\n");
+        extractAudio(videoPath, audioPath).then(() => {
+          console.log("\n=====================------");
+          console.log(`音频提取完成并保存到: ${audioPath}`);
+          console.log("====================------\n");
+        });
+      });
+    } else if (existFile(audioPath)) {
+      extractAudio(videoPath, audioPath).then(() => {
+        console.log("\n=====================------");
+        console.log(`音频提取完成并保存到: ${audioPath}`);
+        console.log("====================------\n");
+      });
+    }
   }
 
   const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");

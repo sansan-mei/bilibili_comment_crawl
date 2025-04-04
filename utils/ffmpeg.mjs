@@ -14,9 +14,10 @@ export const extractAudio = (videoPath, audioPath) => {
   return new Promise((resolve, reject) => {
     ffmpeg(videoPath)
       .outputOptions("-vn")
-      .audioCodec("pcm_s16le")
+      .audioCodec("libmp3lame")
       .audioFrequency(16000)
       .audioChannels(1)
+      .format("mp3")
       .output(audioPath)
       .on("end", resolve)
       .on("error", reject)

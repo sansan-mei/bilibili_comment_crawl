@@ -6,3 +6,5 @@ bun.lockb
 bilibili_detail**
 bilibili_danmaku**
 bilibili_all**
+*.mp4
+*.mp3
