@@ -47,7 +47,11 @@ export const processVideoAndAudio = async (
 ) => {
   try {
     // 如果视频已经有了，那就跳过
-    if (existFile(videoPath) && existFile(audioPath)) {
+    if (
+      existFile(videoPath) &&
+      existFile(audioPath) &&
+      existFile(subtitlesPath)
+    ) {
       console.log(`资源已存在，跳过下载`);
       return;
     }
