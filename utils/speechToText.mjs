@@ -116,11 +116,7 @@ export const audioToText = async (
  * @param {string} modelPath - Vosk模型路径，默认为"model"
  * @returns {Promise<string>} - 返回生成的SRT文件路径
  */
-export const generateSubtitles = async (
-  audioPath,
-  outputPath,
-  modelPath = "model"
-) => {
+export const generateSubtitles = async (audioPath, outputPath, modelPath) => {
   // 检查模型是否存在
   if (!checkModel(modelPath)) {
     throw new Error(

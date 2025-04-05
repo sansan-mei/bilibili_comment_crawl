@@ -2,10 +2,8 @@
 
 import {
   delay,
-  downloadVideo,
   ensureDirectoryExists,
   existFile,
-  extractAudio,
   fetchDanmaku,
   formatDanmakuToTxt,
   getBilibiliDetailUrl,
@@ -15,6 +13,7 @@ import {
   getOid,
   getReplyUrl,
   logStart,
+  processVideoAndAudio,
   processVideoDetail,
   sanitizeFilename,
   saveCommentData,
@@ -102,7 +101,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   const outputDir = path.join(__dirname, `${sanitizedTitle}-${detail.oid}`);
   ensureDirectoryExists(outputDir);
 
-  if (process.env.IS_FETCH_VIDEO_STREAM === "1") {
+  if (process.env.IS_FETCH_VIDEO_STREAM === "1" && process.env.MODEL_PATH) {
     const videoInfoUrl = getBilibiliVideoStreamUrl(bvid, detail.cid);
     console.log(`已获取到视频流URL：${videoInfoUrl}`);
 
@@ -114,29 +113,11 @@ const crawlBilibiliComments = async (forceBVid) => {
 
     const videoPath = path.join(outputDir, `current.mp4`);
     const audioPath = path.join(outputDir, `current.mp3`);
-
+    const subtitlesPath = path.join(outputDir, `subtitles.txt`);
     const videoUrl = videoInfoResponse.data.durl?.[0]?.url;
-    // 如果视频已经有了，那就跳过
-    if (existFile(videoPath) && existFile(audioPath)) {
-      console.log(`资源已存在，跳过下载`);
-    } else if (!existFile(videoPath)) {
-      downloadVideo(videoUrl, videoPath, header).then(() => {
-        console.log("\n================================");
-        console.log(`视频下载完成并保存到: ${videoPath}`);
-        console.log("===============================\n");
-        extractAudio(videoPath, audioPath).then(() => {
-          console.log("\n================================");
-          console.log(`音频提取完成并保存到: ${audioPath}`);
-          console.log("===============================\n");
-        });
-      });
-    } else if (!existFile(audioPath)) {
-      extractAudio(videoPath, audioPath).then(() => {
-        console.log("\n================================");
-        console.log(`音频提取完成并保存到: ${audioPath}`);
-        console.log("===============================\n");
-      });
-    }
+
+    // 启动处理但不等待完成
+    processVideoAndAudio(videoPath, audioPath, videoUrl, subtitlesPath, header);
   }
 
   const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");
@@ -295,7 +276,7 @@ const crawlBilibiliComments = async (forceBVid) => {
 
   console.log(`评论已保存到目录: ${outputDir}`);
 
-  if (process.env.executablePath) {
+  if (process.env.EXECUTABLE_PATH) {
     const browser = (await import("#utils/browser")).default;
     await browser.run(allPath);
   }

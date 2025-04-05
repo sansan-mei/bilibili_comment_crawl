@@ -4,8 +4,9 @@ declare namespace NodeJS {
     B_VID: string;
     COOKIES: string;
     OID: string;
-    executablePath: string;
+    EXECUTABLE_PATH: string;
     IS_FETCH_VIDEO_STREAM: string;
+    MODEL_PATH: string;
   }
 }
 
