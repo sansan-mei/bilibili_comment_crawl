@@ -3,7 +3,6 @@
 import axios from "axios";
 import fs from "fs";
 import { createWriteStream } from "node:fs";
-import path from "path";
 
 /**
  * 延时函数
@@ -111,15 +110,7 @@ export const extractVideoUrl = (data) => {
  */
 export const downloadVideo = async (url, videoPath, headers) => {
   try {
-    // 确保目录存在
-    const dirPath = path.dirname(videoPath);
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-      console.log(`创建目录: ${dirPath}`);
-    }
-
-    console.log(`开始下载视频到: ${videoPath}`);
-    console.log(`使用文件路径: ${path.resolve(videoPath)}`);
+    console.log(`\n开始下载视频到: ${videoPath}`);
 
     const response = await axios.get(url, {
       responseType: "stream",
@@ -133,7 +124,7 @@ export const downloadVideo = async (url, videoPath, headers) => {
     // 返回Promise，不使用泛型语法
     return new Promise((resolve, reject) => {
       writer.on("finish", () => {
-        console.log(`视频下载完成: ${videoPath}`);
+        console.log(`\n视频下载完成: ${videoPath}`);
         // 验证文件是否存在和大小
         if (fs.existsSync(videoPath)) {
           const stats = fs.statSync(videoPath);

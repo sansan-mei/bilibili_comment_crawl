@@ -121,20 +121,20 @@ const crawlBilibiliComments = async (forceBVid) => {
       console.log(`资源已存在，跳过下载`);
     } else if (!existFile(videoPath)) {
       downloadVideo(videoUrl, videoPath, header).then(() => {
-        console.log("\n=====================------");
+        console.log("\n================================");
         console.log(`视频下载完成并保存到: ${videoPath}`);
-        console.log("====================------\n");
+        console.log("===============================\n");
         extractAudio(videoPath, audioPath).then(() => {
-          console.log("\n=====================------");
+          console.log("\n================================");
           console.log(`音频提取完成并保存到: ${audioPath}`);
-          console.log("====================------\n");
+          console.log("===============================\n");
         });
       });
     } else if (!existFile(audioPath)) {
       extractAudio(videoPath, audioPath).then(() => {
-        console.log("\n=====================------");
+        console.log("\n================================");
         console.log(`音频提取完成并保存到: ${audioPath}`);
-        console.log("====================------\n");
+        console.log("===============================\n");
       });
     }
   }
