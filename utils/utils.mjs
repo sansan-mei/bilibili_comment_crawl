@@ -124,7 +124,6 @@ export const downloadVideo = async (url, videoPath, headers) => {
     // 返回Promise，不使用泛型语法
     return new Promise((resolve, reject) => {
       writer.on("finish", () => {
-        console.log(`\n视频下载完成: ${videoPath}`);
         // 验证文件是否存在和大小
         if (fs.existsSync(videoPath)) {
           const stats = fs.statSync(videoPath);
