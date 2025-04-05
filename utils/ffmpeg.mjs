@@ -24,3 +24,5 @@ export const extractAudio = (videoPath, audioPath) => {
       .run();
   });
 };
+
+export { ffmpeg };

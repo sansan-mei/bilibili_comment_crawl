@@ -1,0 +1,3 @@
+仅用于git占位
+下载的模型文件夹例如 vosk-model-small-cn-0.22
+将其移入到model 然后设置 /model/vosk-model-small-cn-0.22 即可

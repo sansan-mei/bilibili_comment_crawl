@@ -18,12 +18,14 @@
     "inquirer": "^12.5.0",
     "protobufjs": "^7.4.0",
     "puppeteer-core": "^24.4.0",
-    "user-agents": "^1.1.475"
+    "user-agents": "^1.1.475",
+    "vosk": "^0.3.39"
   },
   "devDependencies": {
     "@types/fluent-ffmpeg": "^2.1.27",
     "@types/node": "^20.10.0",
-    "@types/user-agents": "^1.0.4"
+    "@types/user-agents": "^1.0.4",
+    "@types/vosk": "^0.3.1"
   },
   "imports": {
     "#export/*": "./export/*.mjs",

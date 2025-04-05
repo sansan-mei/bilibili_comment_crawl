@@ -23,3 +23,6 @@ export * from "./server.mjs";
 
 // 导出FFmpeg相关函数
 export * from "./ffmpeg.mjs";
+
+// 导出语音转文字相关函数
+export * from "./speechToText.mjs";
