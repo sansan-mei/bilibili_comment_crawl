@@ -102,10 +102,10 @@ const crawlBilibiliComments = async (forceBVid) => {
   const outputDir = path.join(__dirname, `${sanitizedTitle}-${detail.oid}`);
   ensureDirectoryExists(outputDir);
 
-  const videoInfoUrl = getBilibiliVideoStreamUrl(bvid, detail.cid);
-  console.log(`已获取到视频流URL：${videoInfoUrl}`);
-
   if (process.env.IS_FETCH_VIDEO_STREAM === "1") {
+    const videoInfoUrl = getBilibiliVideoStreamUrl(bvid, detail.cid);
+    console.log(`已获取到视频流URL：${videoInfoUrl}`);
+
     /** @type {{data:BilibiliVideoInfo}} */
     const { data: videoInfoResponse } = await axios.get(videoInfoUrl, {
       headers: header,
@@ -119,7 +119,7 @@ const crawlBilibiliComments = async (forceBVid) => {
     // 如果视频已经有了，那就跳过
     if (existFile(videoPath) && existFile(audioPath)) {
       console.log(`资源已存在，跳过下载`);
-    } else if (existFile(videoPath)) {
+    } else if (!existFile(videoPath)) {
       downloadVideo(videoUrl, videoPath, header).then(() => {
         console.log("\n=====================------");
         console.log(`视频下载完成并保存到: ${videoPath}`);
@@ -130,7 +130,7 @@ const crawlBilibiliComments = async (forceBVid) => {
           console.log("====================------\n");
         });
       });
-    } else if (existFile(audioPath)) {
+    } else if (!existFile(audioPath)) {
       extractAudio(videoPath, audioPath).then(() => {
         console.log("\n=====================------");
         console.log(`音频提取完成并保存到: ${audioPath}`);
