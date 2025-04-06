@@ -101,25 +101,6 @@ const crawlBilibiliComments = async (forceBVid) => {
   const outputDir = path.join(__dirname, `${sanitizedTitle}-${detail.oid}`);
   ensureDirectoryExists(outputDir);
 
-  if (process.env.IS_FETCH_VIDEO_STREAM === "1" && process.env.MODEL_PATH) {
-    const videoInfoUrl = getBilibiliVideoStreamUrl(bvid, detail.cid);
-    console.log(`已获取到视频流URL：${videoInfoUrl}`);
-
-    /** @type {{data:BilibiliVideoInfo}} */
-    const { data: videoInfoResponse } = await axios.get(videoInfoUrl, {
-      headers: header,
-    });
-    // 这是一个mp4视频流地址，需要下载并将音频提取出来转文本？有什么简单的方式？
-
-    const videoPath = path.join(outputDir, `current.mp4`);
-    const audioPath = path.join(outputDir, `current.mp3`);
-    const subtitlesPath = path.join(outputDir, `subtitles.txt`);
-    const videoUrl = videoInfoResponse.data.durl?.[0]?.url;
-
-    // 启动处理但不等待完成
-    processVideoAndAudio(videoPath, audioPath, videoUrl, subtitlesPath, header);
-  }
-
   const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");
   let danmakuTxtContent = "";
 
@@ -281,7 +262,32 @@ const crawlBilibiliComments = async (forceBVid) => {
     await browser.run(allPath);
   }
 
+  if (process.env.IS_FETCH_VIDEO_STREAM === "1" && process.env.MODEL_PATH) {
+    const videoInfoUrl = getBilibiliVideoStreamUrl(bvid, detail.cid);
+    console.log(`已获取到视频流URL：${videoInfoUrl}`);
+
+    /** @type {{data:BilibiliVideoInfo}} */
+    const { data: videoInfoResponse } = await axios.get(videoInfoUrl, {
+      headers: header,
+    });
+    // 这是一个mp4视频流地址，需要下载并将音频提取出来转文本？有什么简单的方式？
+
+    const videoPath = path.join(outputDir, `current.mp4`);
+    const audioPath = path.join(outputDir, `current.mp3`);
+    const subtitlesPath = path.join(outputDir, `subtitles.txt`);
+    const videoUrl = videoInfoResponse.data.durl?.[0]?.url;
+
+    await processVideoAndAudio(
+      videoPath,
+      audioPath,
+      videoUrl,
+      subtitlesPath,
+      header
+    );
+  }
+
   queue.delete(bvid);
+
   // 检查队列中是否有待执行的任务
   for (const [nextBVid, status] of queue.entries()) {
     if (status === "ready") {
