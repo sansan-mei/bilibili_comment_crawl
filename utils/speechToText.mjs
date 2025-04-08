@@ -1,7 +1,19 @@
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 import { spawn } from "child_process";
 import fs from "fs";
-import vosk from "vosk";
+import os from "os";
+
+// 检测当前是否是ARM架构的macOS
+const isArmMac = os.platform() === 'darwin' && os.arch() === 'arm64';
+
+// 尝试导入vosk，如果失败则提供一个模拟对象
+let vosk;
+try {
+  vosk = isArmMac ? null : await import('vosk').then(m => m.default || m);
+} catch (error) {
+  console.warn("警告: vosk 模块无法导入，语音转文字功能将不可用");
+  vosk = null;
+}
 
 /**
  * 检查模型是否已下载
@@ -26,6 +38,13 @@ export const audioToText = async (
   sampleRate = 16000,
   bufferSize = 4000
 ) => {
+  // 检查Vosk模块是否可用
+  if (!vosk) {
+    throw new Error(
+      `语音识别功能在当前系统上不可用 (${os.platform()} ${os.arch()})`
+    );
+  }
+
   // 检查模型是否存在
   if (!checkModel(modelPath)) {
     throw new Error(
@@ -117,6 +136,11 @@ export const audioToText = async (
  * @returns {Promise<string>} - 返回生成的SRT文件路径
  */
 export const generateSubtitles = async (audioPath, outputPath, modelPath) => {
+  // 检查Vosk模块是否可用
+  if (!vosk) {
+    throw new Error(`语音识别功能在当前系统上不可用 (${os.platform()} ${os.arch()})`);
+  }
+
   // 检查模型是否存在
   if (!checkModel(modelPath)) {
     throw new Error(
@@ -248,16 +272,16 @@ export const generateSubtitles = async (audioPath, outputPath, modelPath) => {
 };
 
 /**
- * 将秒数格式化为SRT时间格式 (00:00:00,000)
+ * 格式化时间为SRT格式
  * @param {number} seconds - 秒数
- * @returns {string} - 格式化的时间字符串
+ * @returns {string} - 格式化后的时间字符串 (00:00:00,000)
  */
 function formatTime(seconds) {
   const date = new Date(seconds * 1000);
-  const hours = String(date.getUTCHours()).padStart(2, "0");
-  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
-  const secs = String(date.getUTCSeconds()).padStart(2, "0");
-  const ms = String(date.getUTCMilliseconds()).padStart(3, "0");
+  const hours = date.getUTCHours().toString().padStart(2, "0");
+  const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+  const secs = date.getUTCSeconds().toString().padStart(2, "0");
+  const ms = date.getUTCMilliseconds().toString().padStart(3, "0");
 
   return `${hours}:${minutes}:${secs},${ms}`;
 }

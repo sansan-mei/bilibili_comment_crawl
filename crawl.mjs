@@ -200,8 +200,7 @@ const crawlBilibiliComments = async (forceBVid) => {
       );
 
       console.log(
-        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${
-          comments.length + totalChildComments
+        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${comments.length + totalChildComments
         }条评论`
       );
 
@@ -242,8 +241,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   }
 
   console.log(
-    `搜集到${comments.length}条主评论，共计${
-      comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
+    `搜集到${comments.length}条主评论，共计${comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
     }条评论（包括子评论）`
   );
 
@@ -262,7 +260,7 @@ const crawlBilibiliComments = async (forceBVid) => {
     await browser.run(allPath);
   }
 
-  if (process.env.IS_FETCH_VIDEO_STREAM === "1" && process.env.MODEL_PATH) {
+  if (process.env.IS_FETCH_VIDEO_STREAM === "1") {
     const videoInfoUrl = getBilibiliVideoStreamUrl(bvid, detail.cid);
     console.log(`已获取到视频流URL：${videoInfoUrl}`);
 

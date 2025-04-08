@@ -18,7 +18,9 @@
     "inquirer": "^12.5.0",
     "protobufjs": "^7.4.0",
     "puppeteer-core": "^24.4.0",
-    "user-agents": "^1.1.475",
+    "user-agents": "^1.1.475"
+  },
+  "optionalDependencies": {
     "vosk": "^0.3.39"
   },
   "devDependencies": {
