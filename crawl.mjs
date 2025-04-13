@@ -123,8 +123,12 @@ const crawlBilibiliComments = async (forceBVid) => {
     danmakuTxtContent = fs.readFileSync(danmakuFilePath, { encoding: "utf-8" });
   }
 
-  const targetCommentCount = Math.floor(detail.reply * 1);
-  console.log(`目标获取评论数: ${targetCommentCount}条（总评论数的90%）`);
+  /** @计算基数0.1-1 */
+  const base = Math.random() * 0.9 + 0.1;
+  const targetCommentCount = Math.floor(detail.reply * base);
+  console.log(
+    `目标获取评论数: ${targetCommentCount}条（总评论数的${base * 100}%）`
+  );
 
   while (true) {
     try {
