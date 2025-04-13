@@ -1,4 +1,5 @@
 import Hapi from "@hapi/hapi";
+import Inert from "@hapi/inert";
 
 /**
  * 处理函数
@@ -9,6 +10,22 @@ let handle;
 const app = Hapi.server({
   port: 39002,
   host: "127.0.0.1",
+});
+
+// 注册静态资源插件
+await app.register(Inert);
+
+// 配置静态资源路由
+app.route({
+  method: "GET",
+  path: "/{param*}",
+  handler: {
+    directory: {
+      path: "public",
+      listing: true,
+      index: true,
+    },
+  },
 });
 
 app.route({

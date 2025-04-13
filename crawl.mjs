@@ -98,7 +98,10 @@ const crawlBilibiliComments = async (forceBVid) => {
 
   // 创建以oid命名的目录，清理文件名中的特殊字符
   const sanitizedTitle = sanitizeFilename(detail.title);
-  const outputDir = path.join(__dirname, `${sanitizedTitle}-${detail.oid}`);
+  const outputDir = path.join(
+    __dirname,
+    `./public/${sanitizedTitle}-${detail.oid}`
+  );
   ensureDirectoryExists(outputDir);
 
   const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");

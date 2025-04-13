@@ -32,9 +32,6 @@ importers:
       user-agents:
         specifier: ^1.1.475
         version: 1.1.503
-      vosk:
-        specifier: ^0.3.39
-        version: 0.3.39
     devDependencies:
       '@types/fluent-ffmpeg':
         specifier: ^2.1.27
@@ -48,6 +45,10 @@ importers:
       '@types/vosk':
         specifier: ^0.3.1
         version: 0.3.1
+    optionalDependencies:
+      vosk:
+        specifier: ^0.3.39
+        version: 0.3.39
 
 packages:
 
@@ -1325,7 +1326,8 @@ snapshots:
 
   async@0.2.10: {}
 
-  async@3.2.6: {}
+  async@3.2.6:
+    optional: true
 
   asynckit@0.4.0: {}
 
@@ -1366,18 +1368,22 @@ snapshots:
 
   basic-ftp@5.0.5: {}
 
-  buffer-alloc-unsafe@1.1.0: {}
+  buffer-alloc-unsafe@1.1.0:
+    optional: true
 
   buffer-alloc@1.2.0:
     dependencies:
       buffer-alloc-unsafe: 1.1.0
       buffer-fill: 1.0.0
+    optional: true
 
   buffer-crc32@0.2.13: {}
 
-  buffer-fill@1.0.0: {}
+  buffer-fill@1.0.0:
+    optional: true
 
-  buffer-from@1.1.2: {}
+  buffer-from@1.1.2:
+    optional: true
 
   call-bind-apply-helpers@1.0.2:
     dependencies:
@@ -1410,17 +1416,20 @@ snapshots:
     dependencies:
       delayed-stream: 1.0.0
 
-  core-util-is@1.0.3: {}
+  core-util-is@1.0.3:
+    optional: true
 
   data-uri-to-buffer@6.0.2: {}
 
   debug@2.6.9:
     dependencies:
       ms: 2.0.0
+    optional: true
 
   debug@3.2.7:
     dependencies:
       ms: 2.1.3
+    optional: true
 
   debug@4.4.0:
     dependencies:
@@ -1511,6 +1520,7 @@ snapshots:
       ref-struct-di: 1.1.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   fluent-ffmpeg@2.1.3:
     dependencies:
@@ -1552,7 +1562,8 @@ snapshots:
     dependencies:
       pump: 3.0.2
 
-  get-symbol-from-current-process-h@1.0.2: {}
+  get-symbol-from-current-process-h@1.0.2:
+    optional: true
 
   get-uri@6.0.4:
     dependencies:
@@ -1565,6 +1576,7 @@ snapshots:
   get-uv-event-loop-napi-h@1.0.6:
     dependencies:
       get-symbol-from-current-process-h: 1.0.2
+    optional: true
 
   gopd@1.2.0: {}
 
@@ -1596,7 +1608,8 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
 
-  inherits@2.0.4: {}
+  inherits@2.0.4:
+    optional: true
 
   inquirer@12.5.2(@types/node@20.17.30):
     dependencies:
@@ -1617,7 +1630,8 @@ snapshots:
 
   is-fullwidth-code-point@3.0.0: {}
 
-  isarray@0.0.1: {}
+  isarray@0.0.1:
+    optional: true
 
   isexe@2.0.0: {}
 
@@ -1631,7 +1645,8 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mic@2.1.2: {}
+  mic@2.1.2:
+    optional: true
 
   mime-db@1.52.0: {}
 
@@ -1643,7 +1658,8 @@ snapshots:
 
   mitt@3.0.1: {}
 
-  ms@2.0.0: {}
+  ms@2.0.0:
+    optional: true
 
   ms@2.1.3: {}
 
@@ -1651,9 +1667,11 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  node-addon-api@3.2.1: {}
+  node-addon-api@3.2.1:
+    optional: true
 
-  node-gyp-build@4.8.4: {}
+  node-gyp-build@4.8.4:
+    optional: true
 
   once@1.4.0:
     dependencies:
@@ -1738,6 +1756,7 @@ snapshots:
       inherits: 2.0.4
       isarray: 0.0.1
       string_decoder: 0.10.31
+    optional: true
 
   ref-napi@3.0.3:
     dependencies:
@@ -1747,12 +1766,14 @@ snapshots:
       node-gyp-build: 4.8.4
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   ref-struct-di@1.1.1:
     dependencies:
       debug: 3.2.7
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   require-directory@2.1.1: {}
 
@@ -1793,6 +1814,7 @@ snapshots:
       debug: 2.6.9
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   streamx@2.22.0:
     dependencies:
@@ -1807,7 +1829,8 @@ snapshots:
       is-fullwidth-code-point: 3.0.0
       strip-ansi: 6.0.1
 
-  string_decoder@0.10.31: {}
+  string_decoder@0.10.31:
+    optional: true
 
   strip-ansi@6.0.1:
     dependencies:
@@ -1858,6 +1881,7 @@ snapshots:
       wav: 1.0.2
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   wav@1.0.2:
     dependencies:
@@ -1868,6 +1892,7 @@ snapshots:
       stream-parser: 0.3.1
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   which@1.3.1:
     dependencies:
