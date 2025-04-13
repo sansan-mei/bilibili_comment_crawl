@@ -123,8 +123,7 @@ const crawlBilibiliComments = async (forceBVid) => {
     danmakuTxtContent = fs.readFileSync(danmakuFilePath, { encoding: "utf-8" });
   }
 
-  // 计算目标评论数量（90%的总评论数）
-  const targetCommentCount = Math.floor(detail.reply * 0.9);
+  const targetCommentCount = Math.floor(detail.reply * 1);
   console.log(`目标获取评论数: ${targetCommentCount}条（总评论数的90%）`);
 
   while (true) {
@@ -200,7 +199,8 @@ const crawlBilibiliComments = async (forceBVid) => {
       );
 
       console.log(
-        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${comments.length + totalChildComments
+        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${
+          comments.length + totalChildComments
         }条评论`
       );
 
@@ -241,7 +241,8 @@ const crawlBilibiliComments = async (forceBVid) => {
   }
 
   console.log(
-    `搜集到${comments.length}条主评论，共计${comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
+    `搜集到${comments.length}条主评论，共计${
+      comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
     }条评论（包括子评论）`
   );
 
