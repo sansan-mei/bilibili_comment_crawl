@@ -1,4 +1,5 @@
 // 交互式命令行界面相关函数
+import { execSync } from "child_process";
 import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
@@ -25,6 +26,7 @@ export async function promptForAction() {
         choices: [
           { name: "爬取新视频", value: "crawl" },
           { name: "查看已爬取视频列表", value: "list" },
+          { name: "浏览器打开文件列表", value: "open" },
           { name: "帮助信息", value: "help" },
           { name: "退出程序", value: "exit" },
         ],
@@ -41,6 +43,9 @@ export async function promptForAction() {
         break;
       case "help":
         showHelp();
+        break;
+      case "open":
+        openCrawledVideo();
         break;
       case "exit":
         console.log("程序已退出");
@@ -134,7 +139,11 @@ export async function listCrawledVideos() {
 
   if (action === "view") {
     try {
-      const detailPath = path.join(rootDir, selectedDir, "bilibili_detail.json");
+      const detailPath = path.join(
+        rootDir,
+        selectedDir,
+        "bilibili_detail.json"
+      );
       if (fs.existsSync(detailPath)) {
         const detailContent = fs.readFileSync(detailPath, {
           encoding: "utf-8",
@@ -167,8 +176,20 @@ export function showHelp() {
   console.log("\n帮助信息:");
   console.log("1. 爬取新视频 - 输入B站视频BV号，爬取视频评论和弹幕");
   console.log("2. 查看已爬取视频列表 - 显示已爬取的视频列表，可以查看详情");
-  console.log("3. 帮助信息 - 显示本帮助信息");
-  console.log("4. 退出程序 - 退出爬虫程序\n");
+  console.log("3. 浏览器打开文件列表 - 浏览器打开已爬取的视频文件列表");
+  console.log("4. 帮助信息 - 显示本帮助信息");
+  console.log("5. 退出程序 - 退出爬虫程序\n");
+
+  promptForAction();
+}
+
+/**
+ * 浏览器打开已爬取的视频
+ */
+export async function openCrawledVideo() {
+  const platform = process.platform;
+  const command = platform === "win32" ? "start" : "open";
+  execSync(`${command} http://127.0.0.1:39002`);
 
   promptForAction();
 }
