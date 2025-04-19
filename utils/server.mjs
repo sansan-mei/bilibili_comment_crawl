@@ -29,10 +29,19 @@ app.route({
 });
 
 app.route({
-  method: "GET",
+  method: "POST",
   path: "/start-crawl/{b_vid}",
   handler: (request) => {
     const { b_vid } = request.params;
+    /** @type {any} */
+    const pl = request.payload;
+    /** @type {Array<{name:string,value:string}>} */
+    const cookies = pl?.cookies;
+    if (cookies) {
+      process.env.COOKIES = cookies
+        .map((item) => `${item.name}=${item.value}`)
+        .join("; ");
+    }
     handle?.(b_vid);
     return handle ? "请求成功，正在处理..." : "未提供处理函数";
   },
