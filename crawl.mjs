@@ -9,6 +9,7 @@ import {
   getBilibiliDetailUrl,
   getBilibiliVideoStreamUrl,
   getBVid,
+  getHeaders,
   getMainCommentUrl,
   getOid,
   getReplyUrl,
@@ -23,14 +24,6 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import UserAgent from "user-agents";
-
-const header = {
-  "user-agent": new UserAgent().toString(),
-  cookie: process.env.COOKIES,
-  referer: "https://www.bilibili.com/",
-  origin: "https://www.bilibili.com/",
-};
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -88,7 +81,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   console.log(`开始爬取视频 ${bvid} 的评论`);
 
   const { data: detailResponse } = await axios.get(getBilibiliDetailUrl(bvid), {
-    headers: header,
+    headers: getHeaders(),
   });
 
   processVideoDetail(detail, detailResponse.data);
@@ -136,7 +129,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   while (true) {
     try {
       const response = await axios.get(getMainCommentUrl(i, getOid()), {
-        headers: header,
+        headers: getHeaders(),
       });
       await delay();
       i += 1; // 获取到下一页
@@ -180,7 +173,7 @@ const crawlBilibiliComments = async (forceBVid) => {
           const { data: replyResponse } = await axios.get(
             getReplyUrl(content.rpid, getOid()),
             {
-              headers: header,
+              headers: getHeaders(),
             }
           );
           /** @type {Array<IComment>} */
@@ -274,7 +267,7 @@ const crawlBilibiliComments = async (forceBVid) => {
 
     /** @type {{data:BilibiliVideoInfo}} */
     const { data: videoInfoResponse } = await axios.get(videoInfoUrl, {
-      headers: header,
+      headers: getHeaders(),
     });
     // 这是一个mp4视频流地址，需要下载并将音频提取出来转文本？有什么简单的方式？
 
@@ -288,7 +281,7 @@ const crawlBilibiliComments = async (forceBVid) => {
       audioPath,
       videoUrl,
       subtitlesPath,
-      header
+      getHeaders()
     );
   }
 

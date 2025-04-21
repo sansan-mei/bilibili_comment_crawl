@@ -3,6 +3,7 @@
 import axios from "axios";
 import fs from "fs";
 import { createWriteStream } from "node:fs";
+import UserAgent from "user-agents";
 
 /**
  * 延时函数
@@ -145,4 +146,17 @@ export const downloadVideo = async (url, videoPath, headers) => {
     );
     throw error;
   }
+};
+
+/**
+ * 获取请求头
+ * @returns {AnyObject} 请求头
+ */
+export const getHeaders = () => {
+  return {
+    "user-agent": new UserAgent().toString(),
+    cookie: process.env.COOKIES,
+    referer: "https://www.bilibili.com/",
+    origin: "https://www.bilibili.com/",
+  };
 };

@@ -1,6 +1,6 @@
 // 弹幕相关功能
 import { DmSegMobileReply } from "#export/index";
-import { delay } from "./utils.mjs";
+import { delay, getHeaders } from "./utils.mjs";
 
 /**
  * 将protobuf时间戳转换为ISO时间
@@ -75,11 +75,7 @@ export const fetchBilDanMu = async (oid, segmentIndex = "1") => {
 
   try {
     const response = await fetch(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        Cookie: process.env.COOKIES,
-      },
+      headers: getHeaders(),
     });
 
     if (!response.ok) {
