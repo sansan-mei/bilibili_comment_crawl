@@ -10,9 +10,9 @@ import UserAgent from "user-agents";
  * @param {number} ms - 延时毫秒数，默认400ms
  * @returns {Promise<void>} - Promise对象
  */
-export const delay = (ms = 400) =>
+export const delay = (ms = 200) =>
   new Promise((resolve) =>
-    setTimeout(resolve, ms + Math.floor(Math.random() * 800))
+    setTimeout(resolve, ms + Math.floor(Math.random() * 200))
   );
 
 /**
