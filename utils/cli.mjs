@@ -92,7 +92,7 @@ export async function promptForBVid() {
  */
 export async function listCrawledVideos() {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const rootDir = path.resolve(__dirname, "../");
+  const rootDir = path.resolve(__dirname, "../public");
   const dirs = fs
     .readdirSync(rootDir)
     .filter((dir) => fs.lstatSync(path.join(rootDir, dir)).isDirectory())
