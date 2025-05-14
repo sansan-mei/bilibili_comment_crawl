@@ -126,7 +126,12 @@ const crawlBilibiliComments = async (forceBVid) => {
     `目标获取评论数: ${targetCommentCount}条（总评论数的${base * 100}%）`
   );
 
+  const hasAll = existFile(path.join(outputDir, "bilibili_all.txt"))
   while (true) {
+    if (hasAll) {
+      console.log("已存在bilibili_all.txt文件，跳过爬取");
+      break;
+    }
     try {
       const response = await axios.get(getMainCommentUrl(i, getOid()), {
         headers: getHeaders(),
@@ -199,8 +204,7 @@ const crawlBilibiliComments = async (forceBVid) => {
       );
 
       console.log(
-        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${
-          comments.length + totalChildComments
+        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${comments.length + totalChildComments
         }条评论`
       );
 
@@ -241,8 +245,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   }
 
   console.log(
-    `搜集到${comments.length}条主评论，共计${
-      comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
+    `搜集到${comments.length}条主评论，共计${comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
     }条评论（包括子评论）`
   );
 
