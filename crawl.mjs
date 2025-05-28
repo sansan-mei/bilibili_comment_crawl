@@ -199,8 +199,7 @@ const crawlBilibiliComments = async (forceBVid) => {
       );
 
       console.log(
-        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${
-          comments.length + totalChildComments
+        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${comments.length + totalChildComments
         }条评论`
       );
 
@@ -241,8 +240,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   }
 
   console.log(
-    `搜集到${comments.length}条主评论，共计${
-      comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
+    `搜集到${comments.length}条主评论，共计${comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
     }条评论（包括子评论）`
   );
 
@@ -311,7 +309,7 @@ async function main() {
     console.log("==================================================\n");
   } else {
     console.log("\n==================================================");
-    console.log("欢迎使用 Bilibili 评论爬虫");
+    console.log("欢迎使用 Bilibili 信息爬虫");
     console.log("==================================================\n");
   }
 
