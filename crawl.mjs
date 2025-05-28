@@ -126,7 +126,12 @@ const crawlBilibiliComments = async (forceBVid) => {
     `目标获取评论数: ${targetCommentCount}条（总评论数的${base * 100}%）`
   );
 
+  const hasAll = existFile(path.join(outputDir, "bilibili_all.txt"))
   while (true) {
+    if (hasAll) {
+      console.log("已存在bilibili_all.txt文件，跳过爬取");
+      break;
+    }
     try {
       const response = await axios.get(getMainCommentUrl(i, getOid()), {
         headers: getHeaders(),
