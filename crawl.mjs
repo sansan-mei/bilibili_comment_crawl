@@ -22,6 +22,7 @@ import {
   saveCommentData,
   startInteractiveMode,
 } from "#utils/index";
+import { convertToSRT } from "#utils/subtitle";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
@@ -91,35 +92,16 @@ const crawlBilibiliComments = async (forceBVid) => {
 
   process.env.OID = detail.oid.toString();
 
-  const { data: subtitleListResponse } = await axios.get(
-    getSubtitleListUrl(bvid, detail.cid, detail.oid),
-    {
-      headers: getHeaders(),
-    }
-  );
-
-  const subtitleUrl = subtitleListResponse?.data.subtitle.subtitles.find(
-    /** @param {BilibiliSubtitle} v */
-    (v) => v.lan.includes("zh")
-  );
-
-  const { data: subtitleResponse } = await axios.get(
-    getSubtitleUrl(subtitleUrl.subtitle_url),
-    {
-      headers: getHeaders(),
-    }
-  );
-
-  /** @type {Array<BilibiliSubtitleDetail>} */
-  const subtitleDetail = subtitleResponse.body;
-  console.log(subtitleDetail);
-
   // 创建以oid命名的目录，清理文件名中的特殊字符
   const sanitizedTitle = sanitizeFilename(detail.title);
   const outputDir = path.join(
     __dirname,
     `./public/${sanitizedTitle}-${detail.oid}`
   );
+  const videoPath = path.join(outputDir, `current.mp4`);
+  const audioPath = path.join(outputDir, `current.mp3`);
+  const subtitlesPath = path.join(outputDir, `subtitles.txt`);
+
   ensureDirectoryExists(outputDir);
 
   const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");
@@ -142,6 +124,38 @@ const crawlBilibiliComments = async (forceBVid) => {
   } else {
     console.log(`弹幕已存在，跳过获取弹幕`);
     danmakuTxtContent = fs.readFileSync(danmakuFilePath, { encoding: "utf-8" });
+  }
+
+  if (!existFile(subtitlesPath)) {
+    console.log(`开始爬取官方字幕`);
+    const { data: subtitleListResponse } = await axios.get(
+      getSubtitleListUrl(bvid, detail.cid, detail.oid),
+      {
+        headers: getHeaders(),
+      }
+    );
+
+    const subtitleUrl = subtitleListResponse?.data.subtitle.subtitles.find(
+      /** @param {BilibiliSubtitle} v */
+      (v) => v.lan.includes("zh")
+    );
+    console.log(`已获取到官方字幕URL：${subtitleUrl.subtitle_url}`);
+    const { data: subtitleResponse } = await axios.get(
+      getSubtitleUrl(subtitleUrl.subtitle_url),
+      {
+        headers: getHeaders(),
+      }
+    );
+    console.log(`已获取到官方字幕内容`);
+    /** @type {Array<BilibiliSubtitleDetail>} */
+    const subtitleDetail = subtitleResponse.body;
+    const srtContent = convertToSRT(subtitleDetail);
+    fs.writeFileSync(subtitlesPath, srtContent, {
+      encoding: "utf-8",
+    });
+    console.log(`已保存官方字幕`);
+  } else {
+    console.log(`已存在官方字幕，跳过爬取`);
   }
 
   /** @计算基数0.1-1 */
@@ -301,9 +315,6 @@ const crawlBilibiliComments = async (forceBVid) => {
     });
     // 这是一个mp4视频流地址，需要下载并将音频提取出来转文本？有什么简单的方式？
 
-    const videoPath = path.join(outputDir, `current.mp4`);
-    const audioPath = path.join(outputDir, `current.mp3`);
-    const subtitlesPath = path.join(outputDir, `subtitles.txt`);
     const videoUrl = videoInfoResponse.data.durl?.[0]?.url;
 
     await processVideoAndAudio(
