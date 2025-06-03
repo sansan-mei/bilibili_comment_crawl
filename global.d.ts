@@ -49,3 +49,25 @@ declare type BilibiliVideoInfo = {
     }>;
   };
 };
+
+declare type BilibiliSubtitle = {
+  ai_status: number;
+  ai_type: number;
+  id: number;
+  id_str: string;
+  is_lock: boolean;
+  lan: string;
+  lan_doc: string;
+  subtitle_url: string;
+  subtitle_url_v2: string;
+  type: number;
+};
+
+declare type BilibiliSubtitleDetail = {
+  content: string;
+  from: number;
+  location: number;
+  music: number;
+  sid: number;
+  to: number;
+};

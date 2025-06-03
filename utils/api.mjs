@@ -39,3 +39,25 @@ export const getBilibiliVideoStreamUrl = (bvid, cid) => {
   // 添加platform=html5参数绕过防盗链验证
   return `https://api.bilibili.com/x/player/playurl?bvid=${bvid}&cid=${cid}&qn=6&fnval=1&platform=html5`;
 };
+
+/**
+ * 获取B站字幕列表Url
+ * @param {string} bvid - BV号
+ * @param {string|number} cid - 分P cid
+ * @param {string|number} aid - 视频aid
+ * @returns {string} 字幕API返回的原始数据，失败返回null
+ */
+export function getSubtitleListUrl(bvid, cid, aid) {
+  const mainApiUrl = `https://api.bilibili.com/x/player/wbi/v2?cid=${cid}&aid=${aid}`;
+  // const backupApiUrl = `https://api.bilibili.com/x/v2/dm/view?aid=${aid}&oid=${cid}&type=1`;
+  return mainApiUrl;
+}
+
+/**
+ * 获取B站字幕Url
+ * @param {string} subtitleUrl - 字幕URL
+ * @returns {string} 字幕URL
+ */
+export function getSubtitleUrl(subtitleUrl) {
+  return `https:${subtitleUrl}`;
+}

@@ -13,6 +13,8 @@ import {
   getMainCommentUrl,
   getOid,
   getReplyUrl,
+  getSubtitleListUrl,
+  getSubtitleUrl,
   logStart,
   processVideoAndAudio,
   processVideoDetail,
@@ -89,6 +91,29 @@ const crawlBilibiliComments = async (forceBVid) => {
 
   process.env.OID = detail.oid.toString();
 
+  const { data: subtitleListResponse } = await axios.get(
+    getSubtitleListUrl(bvid, detail.cid, detail.oid),
+    {
+      headers: getHeaders(),
+    }
+  );
+
+  const subtitleUrl = subtitleListResponse?.data.subtitle.subtitles.find(
+    /** @param {BilibiliSubtitle} v */
+    (v) => v.lan.includes("zh")
+  );
+
+  const { data: subtitleResponse } = await axios.get(
+    getSubtitleUrl(subtitleUrl.subtitle_url),
+    {
+      headers: getHeaders(),
+    }
+  );
+
+  /** @type {Array<BilibiliSubtitleDetail>} */
+  const subtitleDetail = subtitleResponse.body;
+  console.log(subtitleDetail);
+
   // 创建以oid命名的目录，清理文件名中的特殊字符
   const sanitizedTitle = sanitizeFilename(detail.title);
   const outputDir = path.join(
@@ -126,7 +151,7 @@ const crawlBilibiliComments = async (forceBVid) => {
     `目标获取评论数: ${targetCommentCount}条（总评论数的${base * 100}%）`
   );
 
-  const hasAll = existFile(path.join(outputDir, "bilibili_all.txt"))
+  const hasAll = existFile(path.join(outputDir, "bilibili_all.txt"));
   while (true) {
     if (hasAll) {
       console.log("已存在bilibili_all.txt文件，跳过爬取");
@@ -204,7 +229,8 @@ const crawlBilibiliComments = async (forceBVid) => {
       );
 
       console.log(
-        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${comments.length + totalChildComments
+        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${
+          comments.length + totalChildComments
         }条评论`
       );
 
@@ -245,7 +271,8 @@ const crawlBilibiliComments = async (forceBVid) => {
   }
 
   console.log(
-    `搜集到${comments.length}条主评论，共计${comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
+    `搜集到${comments.length}条主评论，共计${
+      comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
     }条评论（包括子评论）`
   );
 
