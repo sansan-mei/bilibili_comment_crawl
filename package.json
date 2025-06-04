@@ -1,19 +1,22 @@
 {
-  "name": "bilibili-comment-crawler",
+  "name": "bilibili-crawler",
   "version": "1.0.0",
   "description": "Bilibili comment crawler in JS",
   "bin": {
     "bil-crawl": "./crawl.mjs"
   },
+  "main": "electron/main.mjs",
   "scripts": {
     "dev": "node --env-file=.env crawl.mjs",
-    "start": "bun run crawl.mjs"
+    "start": "bun run crawl.mjs",
+    "electron": "chcp 65001 && electron ."
   },
   "type": "module",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@hapi/hapi": "^21.4.0",
     "@hapi/inert": "^7.1.0",
+    "auto-launch": "^5.0.6",
     "axios": "^1.6.2",
     "fluent-ffmpeg": "^2.1.3",
     "inquirer": "^12.5.0",
@@ -25,10 +28,12 @@
     "vosk": "^0.3.39"
   },
   "devDependencies": {
+    "@types/auto-launch": "^5.0.5",
     "@types/fluent-ffmpeg": "^2.1.27",
     "@types/node": "^20.10.0",
     "@types/user-agents": "^1.0.4",
-    "@types/vosk": "^0.3.1"
+    "@types/vosk": "^0.3.1",
+    "electron": "^36.4.0"
   },
   "imports": {
     "#export/*": "./export/*.mjs",

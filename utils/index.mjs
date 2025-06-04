@@ -26,3 +26,6 @@ export * from "./ffmpeg.mjs";
 
 // 导出语音转文字相关函数
 export * from "./speechToText.mjs";
+
+// 导出Electron相关函数
+export * from "./electron.mjs";
