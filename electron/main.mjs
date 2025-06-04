@@ -1,7 +1,7 @@
 import { handleChildProcess, killPortProcess } from "#utils/electron";
 import AutoLaunch from "auto-launch";
 import { spawn } from "child_process";
-import { app } from "electron";
+import { app, Notification } from "electron";
 import path from "path";
 
 const bilibiliAutoLauncher = new AutoLaunch({
@@ -26,4 +26,11 @@ app.whenReady().then(async () => {
   });
 
   handleChildProcess(child);
+
+  setTimeout(() => {
+    new Notification({
+      title: "哔哩哔哩脚本",
+      body: "哔哩哔哩脚本启动成功",
+    }).show();
+  }, 5000);
 });
