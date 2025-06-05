@@ -58,6 +58,15 @@
     "electronDownload": {
       "mirror": "https://registry.npmmirror.com/-/binary/electron/"
     },
+    "extraResources": [
+      {
+        "from": "public",
+        "to": "public",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "win": {
       "target": [
         "nsis",

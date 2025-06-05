@@ -64,12 +64,16 @@ export async function buildApp() {
 
     // 捕获正常输出
     buildProcess.stdout?.on("data", (data) => {
-      output += data.toString();
+      const text = data.toString();
+      output += text;
+      process.stdout.write(text); // 实时输出到终端
     });
 
     // 捕获错误输出
     buildProcess.stderr?.on("data", (data) => {
-      errorOutput += data.toString();
+      const text = data.toString();
+      errorOutput += text;
+      process.stderr.write(text); // 实时输出到终端
     });
 
     buildProcess.on("close", (code) => {
