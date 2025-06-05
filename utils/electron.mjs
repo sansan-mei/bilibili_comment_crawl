@@ -1,5 +1,6 @@
-import { execSync } from "child_process";
+import { execSync, spawn } from "child_process";
 import os from "os";
+import { delay } from "./utils.mjs";
 
 /**
  * 释放指定端口
@@ -41,4 +42,22 @@ export async function killPortProcess(port) {
   } catch (e) {
     // 没有占用时会报错，忽略即可
   }
+}
+
+export async function buildApp() {
+  await delay(2000);
+  console.log("开始后台打包应用...");
+
+  const buildProcess = spawn("pnpm", ["run", "build"], {
+    stdio: "ignore", // 完全忽略所有输入输出
+    shell: true,
+    detached: true,
+    windowsHide: true, // Windows 下隐藏窗口
+  });
+
+  // 立即分离进程
+  buildProcess.unref();
+
+  console.log("构建进程已在后台启动");
+  return true;
 }

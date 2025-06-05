@@ -140,20 +140,25 @@ const crawlBilibiliComments = async (forceBVid) => {
       (v) => v.lan.includes("zh")
     );
     console.log(`已获取到官方字幕URL：${subtitleUrl.subtitle_url}`);
-    const { data: subtitleResponse } = await axios.get(
-      getSubtitleUrl(subtitleUrl.subtitle_url),
-      {
-        headers: getHeaders(),
-      }
-    );
-    console.log(`已获取到官方字幕内容`);
-    /** @type {Array<BilibiliSubtitleDetail>} */
-    const subtitleDetail = subtitleResponse.body;
-    const srtContent = convertToSRT(subtitleDetail);
-    fs.writeFileSync(subtitlesPath, srtContent, {
-      encoding: "utf-8",
-    });
-    console.log(`已保存官方字幕`);
+
+    if (subtitleUrl.subtitle_url) {
+      const { data: subtitleResponse } = await axios.get(
+        getSubtitleUrl(subtitleUrl.subtitle_url),
+        {
+          headers: getHeaders(),
+        }
+      );
+      console.log(`已获取到官方字幕内容`);
+      /** @type {Array<BilibiliSubtitleDetail>} */
+      const subtitleDetail = subtitleResponse.body;
+      const srtContent = convertToSRT(subtitleDetail);
+      fs.writeFileSync(subtitlesPath, srtContent, {
+        encoding: "utf-8",
+      });
+      console.log(`已保存官方字幕`);
+    } else {
+      console.log("没有获取到官方字幕URL，跳过爬取");
+    }
   } else {
     console.log(`已存在官方字幕，跳过爬取`);
   }
@@ -358,8 +363,18 @@ async function main() {
 
   // 启动Hapi服务器
   await logStart(crawlBilibiliComments);
-  // 启动交互式命令行界面
-  startInteractiveMode();
+
+  // 检测是否在 Electron 环境中
+  const isElectron = process.versions && process.versions.electron;
+
+  if (isElectron) {
+    console.log("运行在 Electron 环境，请使用 GUI 界面或 API 接口");
+    console.log("API地址: http://127.0.0.1:39002/start-crawl/{bvid}");
+    console.log("==================================================");
+  } else {
+    // 启动交互式命令行界面
+    startInteractiveMode();
+  }
 }
 
 // 检查命令行参数，如果有 --cmd 或 -cmd 就直接跑 main

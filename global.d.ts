@@ -58,8 +58,8 @@ declare type BilibiliSubtitle = {
   is_lock: boolean;
   lan: string;
   lan_doc: string;
-  subtitle_url: string;
-  subtitle_url_v2: string;
+  subtitle_url?: string;
+  subtitle_url_v2?: string;
   type: number;
 };
 

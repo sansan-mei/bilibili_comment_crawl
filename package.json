@@ -2,6 +2,7 @@
   "name": "bilibili-crawler",
   "version": "1.0.0",
   "description": "Bilibili comment crawler in JS",
+  "author": "MEI YI YI",
   "bin": {
     "bil-crawl": "./crawl.mjs"
   },
@@ -9,7 +10,8 @@
   "scripts": {
     "dev": "node --env-file=.env crawl.mjs -cmd",
     "start": "bun run crawl.mjs",
-    "electron": "electron ."
+    "electron": "electron .",
+    "build": "electron-builder build --win --publish never"
   },
   "type": "module",
   "dependencies": {
@@ -33,7 +35,8 @@
     "@types/node": "^20.10.0",
     "@types/user-agents": "^1.0.4",
     "@types/vosk": "^0.3.1",
-    "electron": "^36.4.0"
+    "electron": "^36.4.0",
+    "electron-builder": "^26.0.12"
   },
   "imports": {
     "#export/*": "./export/*.mjs",
@@ -43,5 +46,37 @@
   "engines": {
     "node": ">=20.6.0"
   },
-  "license": "GPL-3.0-only"
+  "license": "GPL-3.0-only",
+  "build": {
+    "appId": "com.bilibili.crawler",
+    "productName": "Bilibili脚本",
+    "directories": {
+      "output": "dist"
+    },
+    "npmRebuild": false,
+    "buildDependenciesFromSource": false,
+    "electronDownload": {
+      "mirror": "https://registry.npmmirror.com/-/binary/electron/"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ]
+  }
 }

@@ -2,10 +2,18 @@ import { crawlScript } from "#crawl";
 import { killPortProcess } from "#utils/electron";
 import AutoLaunch from "auto-launch";
 import { app, Notification } from "electron";
+import path from "path";
+
+const appPath = path.join(
+  process.cwd(),
+  "dist",
+  "win-unpacked",
+  "Bilibili脚本.exe"
+);
 
 const bilibiliAutoLauncher = new AutoLaunch({
   name: "Bilibili脚本",
-  path: process.execPath, // Electron 可执行文件
+  path: appPath,
 });
 
 // 开机自启
@@ -21,4 +29,7 @@ app.whenReady().then(async () => {
     title: "哔哩哔哩脚本",
     body: "哔哩哔哩脚本启动成功",
   }).show();
+
+  // 检查并打包
+  // buildApp();
 });
