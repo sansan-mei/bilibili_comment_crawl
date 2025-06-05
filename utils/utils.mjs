@@ -160,3 +160,9 @@ export const getHeaders = () => {
     origin: "https://www.bilibili.com/",
   };
 };
+
+// 判断是不是electron环境
+export function isElectron() {
+  // 检测是否在 Electron 环境中
+  return process.versions && process.versions.electron;
+}

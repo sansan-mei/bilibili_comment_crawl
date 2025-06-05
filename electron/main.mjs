@@ -33,3 +33,8 @@ app.whenReady().then(async () => {
   // 检查并打包
   // buildApp();
 });
+
+// 防止应用在所有窗口关闭时退出（保持托盘运行）
+app.on("window-all-closed", (/** @type {any} */ event) => {
+  event.preventDefault();
+});

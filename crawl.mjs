@@ -364,17 +364,8 @@ async function main() {
   // 启动Hapi服务器
   await logStart(crawlBilibiliComments);
 
-  // 检测是否在 Electron 环境中
-  const isElectron = process.versions && process.versions.electron;
-
-  if (isElectron) {
-    console.log("运行在 Electron 环境，请使用 GUI 界面或 API 接口");
-    console.log("API地址: http://127.0.0.1:39002/start-crawl/{bvid}");
-    console.log("==================================================");
-  } else {
-    // 启动交互式命令行界面
-    startInteractiveMode();
-  }
+  // 启动交互式命令行界面
+  startInteractiveMode();
 }
 
 // 检查命令行参数，如果有 --cmd 或 -cmd 就直接跑 main

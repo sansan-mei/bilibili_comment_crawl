@@ -5,12 +5,28 @@ import inquirer from "inquirer";
 import path from "path";
 import { fileURLToPath } from "url";
 import { crawlBilibiliComments } from "../crawl.mjs";
+import { createSystemTray } from "./tray.mjs";
+import { isElectron } from "./utils.mjs";
 
 /**
  * 启动交互式命令行模式，使用inquirer库提供更好的用户体验
  */
-export function startInteractiveMode() {
-  promptForAction();
+export async function startInteractiveMode() {
+  // 判断如果是在 Electron 环境，就创建系统托盘
+  if (isElectron()) {
+    console.log("运行在 Electron 环境，请使用系统托盘功能");
+    try {
+      await createSystemTray();
+      console.log("系统托盘已创建，可以最小化到托盘");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.log("托盘创建失败，使用普通命令行模式:", errorMessage);
+      promptForAction();
+    }
+  } else {
+    promptForAction();
+  }
 }
 
 /**
