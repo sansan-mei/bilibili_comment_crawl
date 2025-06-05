@@ -46,18 +46,63 @@ export async function killPortProcess(port) {
 
 export async function buildApp() {
   await delay(2000);
-  console.log("开始后台打包应用...");
+  console.log("开始构建应用...");
 
-  const buildProcess = spawn("pnpm", ["run", "build"], {
-    stdio: "ignore", // 完全忽略所有输入输出
-    shell: true,
-    detached: true,
-    windowsHide: true, // Windows 下隐藏窗口
+  return new Promise((resolve, reject) => {
+    const buildProcess = spawn(
+      "electron-builder",
+      ["build", "--win", "--publish", "never"],
+      {
+        stdio: ["ignore", "pipe", "pipe"], // 捕获stdout和stderr
+        shell: true,
+        windowsHide: true,
+      }
+    );
+
+    let output = "";
+    let errorOutput = "";
+
+    // 捕获正常输出
+    buildProcess.stdout?.on("data", (data) => {
+      output += data.toString();
+    });
+
+    // 捕获错误输出
+    buildProcess.stderr?.on("data", (data) => {
+      errorOutput += data.toString();
+    });
+
+    buildProcess.on("close", (code) => {
+      console.log(`构建进程已关闭，退出码: ${code}`);
+
+      if (code === 0) {
+        console.log("✅ 构建成功！");
+        resolve({
+          success: true,
+          code,
+          output,
+          errorOutput,
+        });
+      } else {
+        console.log("❌ 构建失败！");
+        console.log("错误输出:", errorOutput);
+        resolve({
+          success: false,
+          code,
+          output,
+          errorOutput,
+        });
+      }
+    });
+
+    buildProcess.on("error", (error) => {
+      console.error(`构建进程发生错误: ${error}`);
+      reject({
+        success: false,
+        error: error.message,
+        output,
+        errorOutput,
+      });
+    });
   });
-
-  // 立即分离进程
-  buildProcess.unref();
-
-  console.log("构建进程已在后台启动");
-  return true;
 }

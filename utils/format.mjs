@@ -51,9 +51,10 @@ export const formatDanmakuToTxt = (danmus) => {
  * @param {string} videoInfo - 视频信息
  * @param {string} comments - 评论
  * @param {string} danmus - 弹幕
+ * @param {string} zimu - 字幕
  * @returns {string} - 合成的txt文件内容
  */
-export const mergeTxt = (videoInfo, comments, danmus) => {
-  const txtContent = `视频信息：\n${videoInfo}\n评论：\n${comments}\n弹幕：\n${danmus}`;
+export const mergeTxt = (videoInfo, comments, danmus, zimu) => {
+  const txtContent = `视频信息：\n${videoInfo}\n弹幕：\n${danmus}\n字幕：\n${zimu}\n评论：\n${comments}`;
   return txtContent;
 };

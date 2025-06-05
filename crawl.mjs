@@ -106,6 +106,7 @@ const crawlBilibiliComments = async (forceBVid) => {
 
   const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");
   let danmakuTxtContent = "";
+  let zimuTextContent = "";
 
   /** @做一个函数，当读取到的弹幕数量有detail.danmaku的80%时就不读取 */
   if (!existFile(danmakuFilePath)) {
@@ -151,8 +152,8 @@ const crawlBilibiliComments = async (forceBVid) => {
       console.log(`已获取到官方字幕内容`);
       /** @type {Array<BilibiliSubtitleDetail>} */
       const subtitleDetail = subtitleResponse.body;
-      const srtContent = convertToSRT(subtitleDetail);
-      fs.writeFileSync(subtitlesPath, srtContent, {
+      zimuTextContent = convertToSRT(subtitleDetail);
+      fs.writeFileSync(subtitlesPath, zimuTextContent, {
         encoding: "utf-8",
       });
       console.log(`已保存官方字幕`);
@@ -161,6 +162,7 @@ const crawlBilibiliComments = async (forceBVid) => {
     }
   } else {
     console.log(`已存在官方字幕，跳过爬取`);
+    zimuTextContent = fs.readFileSync(subtitlesPath, { encoding: "utf-8" });
   }
 
   /** @计算基数0.1-1 */
@@ -300,7 +302,8 @@ const crawlBilibiliComments = async (forceBVid) => {
     outputDir,
     comments,
     detail,
-    danmakuTxtContent
+    danmakuTxtContent,
+    zimuTextContent
   );
 
   console.log(`评论已保存到目录: ${outputDir}`);

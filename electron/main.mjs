@@ -1,23 +1,6 @@
 import { crawlScript } from "#crawl";
-import { buildApp, killPortProcess } from "#utils/electron";
-import AutoLaunch from "auto-launch";
+import { killPortProcess } from "#utils/electron";
 import { app, Notification } from "electron";
-import path from "path";
-
-const appPath = path.join(
-  process.cwd(),
-  "dist",
-  "win-unpacked",
-  "Bilibili脚本.exe"
-);
-
-const bilibiliAutoLauncher = new AutoLaunch({
-  name: "Bilibili脚本",
-  path: appPath,
-});
-
-// 开机自启
-bilibiliAutoLauncher.enable();
 
 app.whenReady().then(async () => {
   // 先释放端口
@@ -29,9 +12,6 @@ app.whenReady().then(async () => {
     title: "哔哩哔哩脚本",
     body: "哔哩哔哩脚本启动成功",
   }).show();
-
-  // 检查并打包
-  buildApp();
 });
 
 // 防止应用在所有窗口关闭时退出（保持托盘运行）

@@ -28,13 +28,15 @@ export const existFile = (filePath) => {
  * @param {AnyArray} comments - 评论数据
  * @param {BilibiliDetail} detail - 视频详情
  * @param {string} danmakuTxtContent - 弹幕内容
+ * @param {string} zimuTextContent - 字幕内容
  * @returns {Promise<{allPath: string, commentPath: string, detailPath: string, danmakuPath: string}>}
  */
 export const saveCommentData = async (
   outputDir,
   comments,
   detail,
-  danmakuTxtContent
+  danmakuTxtContent,
+  zimuTextContent
 ) => {
   const allPath = path.join(outputDir, "bilibili_all.txt");
   const commentPath = path.join(outputDir, "bilibili_comment.txt");
@@ -57,7 +59,8 @@ export const saveCommentData = async (
   const allTxtContent = mergeTxt(
     JSON.stringify(detail),
     txtContent,
-    danmakuTxtContent
+    danmakuTxtContent,
+    zimuTextContent
   );
   fs.writeFileSync(allPath, allTxtContent, {
     encoding: "utf-8",

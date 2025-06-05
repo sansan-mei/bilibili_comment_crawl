@@ -11,7 +11,7 @@
     "dev": "node --env-file=.env crawl.mjs -cmd",
     "start": "bun run crawl.mjs",
     "electron": "electron .",
-    "build": "electron-builder build --win --publish never"
+    "build": "bun run electron/build.mjs"
   },
   "type": "module",
   "dependencies": {
