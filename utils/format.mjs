@@ -1,5 +1,5 @@
 // 格式化数据相关函数
-import { formatTime } from './utils.mjs';
+import { formatTime } from "./utils.mjs";
 
 /**
  * 格式化评论为TXT内容
@@ -16,14 +16,17 @@ export const formatCommentsToTxt = (comments) => {
       if (c.childList && c.childList.length > 0) {
         const childComments = c.childList
           // @ts-ignore
-          .map(child => `  └─ ${child.author}：${child.sex}：时间-${child.time}：内容-${child.content}：点赞-${child.like}`)
+          .map(
+            (child) =>
+              `  └─ ${child.author}：${child.sex}：时间-${child.time}：内容-${child.content}：点赞-${child.like}`
+          )
           .join("\n");
         commentText += "\n" + childComments;
       }
 
       return commentText;
     })
-    .join("\n\n");  // 使用两个换行符分隔不同的主评论及其子评论
+    .join("\n\n"); // 使用两个换行符分隔不同的主评论及其子评论
 };
 
 /**
@@ -32,10 +35,15 @@ export const formatCommentsToTxt = (comments) => {
  * @returns {string} - 格式化后的文本
  */
 export const formatDanmakuToTxt = (danmus) => {
-  return danmus.map(danmu => {
-    const timeStr = formatTime(danmu.time);
-    return `[${timeStr}] ${danmu.content} (发送者: ${danmu.sender}, 类型: ${danmu.type})`;
-  }).join('\n');
+  // 确保弹幕按时间排序
+  const sortedDanmus = [...danmus].sort((a, b) => a.time - b.time);
+
+  return sortedDanmus
+    .map((danmu) => {
+      const timeStr = formatTime(danmu.time);
+      return `[${timeStr}] ${danmu.content} (发送者: ${danmu.sender}, 类型: ${danmu.type})`;
+    })
+    .join("\n");
 };
 
 /**
@@ -48,4 +56,4 @@ export const formatDanmakuToTxt = (danmus) => {
 export const mergeTxt = (videoInfo, comments, danmus) => {
   const txtContent = `视频信息：\n${videoInfo}\n评论：\n${comments}\n弹幕：\n${danmus}`;
   return txtContent;
-}; 
+};

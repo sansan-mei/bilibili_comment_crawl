@@ -134,6 +134,10 @@ export const fetchDanmaku = async (cid, totalDanmaku) => {
       }
     }
 
+    // 按时间排序弹幕
+    danmus.sort((a, b) => a.time - b.time);
+    console.log("弹幕已按时间排序");
+
     return danmus;
   } catch (error) {
     console.error("获取弹幕失败:", error);
