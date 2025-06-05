@@ -1,5 +1,5 @@
 import { crawlScript } from "#crawl";
-import { killPortProcess } from "#utils/electron";
+import { buildApp, killPortProcess } from "#utils/electron";
 import AutoLaunch from "auto-launch";
 import { app, Notification } from "electron";
 import path from "path";
@@ -31,7 +31,7 @@ app.whenReady().then(async () => {
   }).show();
 
   // 检查并打包
-  // buildApp();
+  buildApp();
 });
 
 // 防止应用在所有窗口关闭时退出（保持托盘运行）
