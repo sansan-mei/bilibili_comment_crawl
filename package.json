@@ -7,9 +7,9 @@
   },
   "main": "electron/main.mjs",
   "scripts": {
-    "dev": "node --env-file=.env crawl.mjs",
+    "dev": "node --env-file=.env crawl.mjs -cmd",
     "start": "bun run crawl.mjs",
-    "electron": "chcp 65001 && electron ."
+    "electron": "electron ."
   },
   "type": "module",
   "dependencies": {
@@ -37,7 +37,8 @@
   },
   "imports": {
     "#export/*": "./export/*.mjs",
-    "#utils/*": "./utils/*.mjs"
+    "#utils/*": "./utils/*.mjs",
+    "#crawl": "./crawl.mjs"
   },
   "engines": {
     "node": ">=20.6.0"

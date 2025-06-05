@@ -362,9 +362,9 @@ async function main() {
   startInteractiveMode();
 }
 
-// 执行主程序
-main().catch((error) => {
-  console.error("程序运行失败:", error);
-});
+// 检查命令行参数，如果有 --cmd 或 -cmd 就直接跑 main
+if (process.argv.includes("--cmd") || process.argv.includes("-cmd")) {
+  main();
+}
 
-export { crawlBilibiliComments };
+export { crawlBilibiliComments, main as crawlScript };
