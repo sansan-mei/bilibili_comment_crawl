@@ -50,6 +50,14 @@
   "build": {
     "appId": "com.bilibili.crawler",
     "productName": "Bilibili脚本",
+    "directories": {
+      "output": "dist"
+    },
+    "npmRebuild": false,
+    "buildDependenciesFromSource": false,
+    "electronDownload": {
+      "mirror": "https://registry.npmmirror.com/-/binary/electron/"
+    },
     "asar": true,
     "asarUnpack": [
       "**/node_modules/@ffmpeg-installer/**/*",
@@ -64,28 +72,40 @@
         ]
       }
     ],
-    "npmRebuild": false,
-    "buildDependenciesFromSource": false,
-    "electronDownload": {
-      "mirror": "https://registry.npmmirror.com/-/binary/electron/"
-    },
     "win": {
-      "target": "nsis"
+      "target": {
+        "target": "nsis"
+      }
+    },
+    "portable": {
+      "artifactName": "Bilibili脚本.exe"
     },
     "mac": {
-      "target": "dmg",
-      "arch": [
-        "x64",
-        "arm64"
-      ]
+      "target": {
+        "target": "dmg",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      },
+      "category": "public.app-category.utilities"
     },
     "dmg": {
       "artifactName": "Bilibili脚本.dmg"
     },
     "files": [
       "**/*",
-      "!**/{.git,.idea,.vscode,__pycache__,node_modules/*/test/**}",
-      "!**/*.{md,ts,yml}"
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
     ]
   }
 }
