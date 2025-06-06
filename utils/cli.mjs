@@ -3,9 +3,8 @@ import { execSync } from "child_process";
 import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
-import { fileURLToPath } from "url";
 import { crawlBilibiliComments } from "../crawl.mjs";
-import { isElectron } from "./utils.mjs";
+import { getStaticPath, isElectron } from "./utils.mjs";
 
 /**
  * 启动交互式命令行模式，使用inquirer库提供更好的用户体验
@@ -107,8 +106,7 @@ export async function promptForBVid() {
  * 列出已爬取的视频
  */
 export async function listCrawledVideos() {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const rootDir = path.resolve(__dirname, "../public");
+  const rootDir = await getStaticPath();
   const dirs = fs
     .readdirSync(rootDir)
     .filter((dir) => fs.lstatSync(path.join(rootDir, dir)).isDirectory())
