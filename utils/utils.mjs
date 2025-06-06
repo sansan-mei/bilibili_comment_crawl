@@ -3,6 +3,8 @@
 import axios from "axios";
 import fs from "fs";
 import { createWriteStream } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import UserAgent from "user-agents";
 
 /**
@@ -166,3 +168,29 @@ export function isElectron() {
   // 检测是否在 Electron 环境中
   return process.versions && process.versions.electron;
 }
+
+// 判断是不是electron打包环境
+export async function isElectronPackaged() {
+  if (!isElectron()) {
+    return false;
+  }
+  try {
+    const { app } = await import("electron");
+    return app.isPackaged;
+  } catch {
+    return false;
+  }
+}
+
+// 动态获取静态资源路径
+export const getStaticPath = async () => {
+  if (await isElectronPackaged()) {
+    const { app: electronApp } = await import("electron");
+    return path.join(electronApp.getPath("userData"), "bilibili_data");
+  } else {
+    return path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "../public"
+    );
+  }
+};

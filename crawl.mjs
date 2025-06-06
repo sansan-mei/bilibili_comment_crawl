@@ -13,6 +13,7 @@ import {
   getMainCommentUrl,
   getOid,
   getReplyUrl,
+  getStaticPath,
   getSubtitleListUrl,
   getSubtitleUrl,
   logStart,
@@ -91,7 +92,11 @@ const crawlBilibiliComments = async (forceBVid) => {
 
   // 创建以oid命名的目录，清理文件名中的特殊字符
   const sanitizedTitle = sanitizeFilename(detail.title);
-  const outputDir = path.resolve(`./public/${sanitizedTitle}-${detail.oid}`);
+
+  // 使用统一的路径获取函数
+  const basePath = await getStaticPath();
+  const outputDir = path.join(basePath, `${sanitizedTitle}-${detail.oid}`);
+  console.log(`数据保存到: ${outputDir}`);
 
   const videoPath = path.join(outputDir, `current.mp4`);
   const audioPath = path.join(outputDir, `current.mp3`);
