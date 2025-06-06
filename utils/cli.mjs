@@ -5,7 +5,6 @@ import inquirer from "inquirer";
 import path from "path";
 import { fileURLToPath } from "url";
 import { crawlBilibiliComments } from "../crawl.mjs";
-import { createSystemTray } from "./tray.mjs";
 import { isElectron } from "./utils.mjs";
 
 /**
@@ -16,6 +15,7 @@ export async function startInteractiveMode() {
   if (isElectron()) {
     console.log("运行在 Electron 环境，请使用系统托盘功能");
     try {
+      const { createSystemTray } = await import("./tray.mjs");
       await createSystemTray();
       console.log("系统托盘已创建，可以最小化到托盘");
     } catch (error) {

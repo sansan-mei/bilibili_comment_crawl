@@ -26,9 +26,6 @@ import { convertToSRT } from "#utils/subtitle";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {Map<string,'running' | 'ready'>} */
 const queue = new Map();
@@ -94,10 +91,8 @@ const crawlBilibiliComments = async (forceBVid) => {
 
   // 创建以oid命名的目录，清理文件名中的特殊字符
   const sanitizedTitle = sanitizeFilename(detail.title);
-  const outputDir = path.join(
-    __dirname,
-    `./public/${sanitizedTitle}-${detail.oid}`
-  );
+  const outputDir = path.resolve(`./public/${sanitizedTitle}-${detail.oid}`);
+
   const videoPath = path.join(outputDir, `current.mp4`);
   const audioPath = path.join(outputDir, `current.mp3`);
   const subtitlesPath = path.join(outputDir, `subtitles.txt`);
