@@ -48,16 +48,20 @@ export async function buildApp() {
   await delay(2000);
   console.log("开始构建应用...");
 
+  // 根据当前平台决定构建参数
+  const buildArgs = ["build", "--publish", "never"];
+  if (os.platform() === "darwin") {
+    buildArgs.push("--mac");
+  } else if (os.platform() === "win32") {
+    buildArgs.push("--win");
+  }
+
   return new Promise((resolve, reject) => {
-    const buildProcess = spawn(
-      "electron-builder",
-      ["build", "--win", "--publish", "never"],
-      {
-        stdio: ["ignore", "pipe", "pipe"], // 捕获stdout和stderr
-        shell: true,
-        windowsHide: true,
-      }
-    );
+    const buildProcess = spawn("electron-builder", buildArgs, {
+      stdio: ["ignore", "pipe", "pipe"], // 捕获stdout和stderr
+      shell: true,
+      windowsHide: true,
+    });
 
     let output = "";
     let errorOutput = "";
