@@ -3,7 +3,7 @@
 import axios from "axios";
 import fs from "fs";
 import { createWriteStream } from "node:fs";
-import path from "node:path";
+import path, { normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import UserAgent from "user-agents";
 
@@ -184,6 +184,11 @@ export async function isElectronPackaged() {
 
 // 动态获取静态资源路径
 export const getStaticPath = async () => {
+  // 优先读取环境变量中的路径
+  if (process.env.STATIC_PATH) {
+    return normalize(process.env.STATIC_PATH);
+  }
+
   if (await isElectronPackaged()) {
     const { app: electronApp } = await import("electron");
     return path.join(electronApp.getPath("userData"), "bilibili_data");

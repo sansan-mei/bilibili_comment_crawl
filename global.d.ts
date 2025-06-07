@@ -7,6 +7,7 @@ declare namespace NodeJS {
     EXECUTABLE_PATH: string;
     IS_FETCH_VIDEO_STREAM: string;
     MODEL_PATH: string;
+    STATIC_PATH: string;
   }
 }
 

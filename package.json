@@ -36,7 +36,8 @@
     "@types/user-agents": "^1.0.4",
     "@types/vosk": "^0.3.1",
     "electron": "^36.4.0",
-    "electron-builder": "^26.0.12"
+    "electron-builder": "^26.0.12",
+    "dotenv": "^16.5.0"
   },
   "imports": {
     "#export/*": "./export/*.mjs",
@@ -67,6 +68,15 @@
       {
         "from": "public",
         "to": "public",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "extraFiles": [
+      {
+        "from": ".env",
+        "to": ".env",
         "filter": [
           "**/*"
         ]
