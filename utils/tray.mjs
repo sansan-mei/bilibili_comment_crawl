@@ -66,16 +66,9 @@ export async function createSystemTray() {
   // 创建托盘菜单
   createTrayMenu();
 
-  // 双击托盘图标的行为
-  tray.on("double-click", () => {
-    console.log("双击了托盘图标");
-    // 显示当前屏幕信息
-    const displays = screen.getAllDisplays();
-    const primaryDisplay = screen.getPrimaryDisplay();
-    console.log(
-      `主屏幕: ${primaryDisplay.bounds.width}x${primaryDisplay.bounds.height}`
-    );
-    console.log(`总屏幕数: ${displays.length}`);
+  // 左键单击托盘图标 - 显示上下文菜单
+  tray.on("click", () => {
+    tray?.popUpContextMenu();
   });
 
   // 右键点击事件（主要用于调试）
