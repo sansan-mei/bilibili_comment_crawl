@@ -2,10 +2,12 @@ import { crawlScript } from "#crawl";
 import { killPortProcess } from "#utils/electron";
 import { config } from "dotenv";
 import { app, Notification } from "electron";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 app.whenReady().then(async () => {
-  // 加载.env文件（构建时生成的）
-  config();
+  const envPath = join(dirname(fileURLToPath(import.meta.url)), "../.env");
+  config({ path: envPath });
 
   if (process.env.STATIC_PATH) {
     console.log(`\n已加载 STATIC_PATH: ${process.env.STATIC_PATH}\n`);

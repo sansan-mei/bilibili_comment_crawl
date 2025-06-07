@@ -64,15 +64,11 @@
       "**/node_modules/@ffmpeg-installer/**/*",
       "**/node_modules/vosk/**/*"
     ],
-    "extraResources": [
-      {
-        "from": "public",
-        "to": "public",
-        "filter": [
-          "**/*"
-        ]
+    "win": {
+      "target": {
+        "target": "nsis"
       }
-    ],
+    },
     "extraFiles": [
       {
         "from": ".env",
@@ -82,11 +78,6 @@
         ]
       }
     ],
-    "win": {
-      "target": {
-        "target": "nsis"
-      }
-    },
     "portable": {
       "artifactName": "Bilibili脚本.exe"
     },
