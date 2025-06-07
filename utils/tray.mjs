@@ -1,6 +1,8 @@
 // 系统托盘管理模块
+import AutoLaunch from "auto-launch";
 import { Menu, nativeImage, screen, Tray } from "electron";
 import { readFile } from "fs/promises";
+import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { listCrawledVideos, openCrawledVideo, showHelp } from "./cli.mjs";
@@ -9,6 +11,80 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {Tray | null} */
 let tray = null;
+
+/** @type {AutoLaunch | null} */
+let autoLauncher = null;
+
+/**
+ * 初始化自启动管理器
+ */
+function initAutoLauncher() {
+  if (autoLauncher) return autoLauncher;
+
+  // 根据平台确定应用路径
+  let appPath;
+  if (os.platform() === "win32") {
+    appPath = path.resolve(process.cwd(), "Bilibili脚本.exe");
+  } else if (os.platform() === "darwin") {
+    appPath = path.resolve(process.cwd(), "Bilibili脚本.app");
+  }
+
+  if (appPath) {
+    autoLauncher = new AutoLaunch({
+      name: "Bilibili脚本",
+      path: appPath,
+    });
+  }
+
+  return autoLauncher;
+}
+
+/**
+ * 检查自启动状态
+ */
+async function checkAutoLaunchStatus() {
+  const launcher = initAutoLauncher();
+  if (!launcher) return false;
+
+  try {
+    return await launcher.isEnabled();
+  } catch (error) {
+    console.log(
+      "检查自启动状态失败:",
+      error instanceof Error ? error.message : String(error)
+    );
+    return false;
+  }
+}
+
+/**
+ * 切换自启动状态
+ */
+async function toggleAutoLaunch() {
+  const launcher = initAutoLauncher();
+  if (!launcher) {
+    console.log("自启动功能不可用");
+    return;
+  }
+
+  try {
+    const isEnabled = await launcher.isEnabled();
+    if (isEnabled) {
+      await launcher.disable();
+      console.log("✅ 已关闭开机自启动");
+    } else {
+      await launcher.enable();
+      console.log("✅ 已开启开机自启动");
+    }
+    // 重新创建菜单以更新状态显示
+    createTrayMenu();
+  } catch (error) {
+    console.log(
+      "切换自启动状态失败:",
+      error instanceof Error ? error.message : String(error)
+    );
+  }
+}
 
 /**
  * 创建系统托盘
@@ -96,8 +172,11 @@ function refreshTray() {
 /**
  * 创建托盘菜单的辅助函数
  */
-function createTrayMenu() {
+async function createTrayMenu() {
   if (!tray) return;
+
+  // 检查自启动状态
+  const isAutoLaunchEnabled = await checkAutoLaunchStatus();
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -116,6 +195,13 @@ function createTrayMenu() {
       label: "帮助信息",
       click: () => {
         showHelp();
+      },
+    },
+    { type: "separator" },
+    {
+      label: `${isAutoLaunchEnabled ? "关闭" : "开启"}开机自启动`,
+      click: async () => {
+        await toggleAutoLaunch();
       },
     },
     { type: "separator" },
@@ -170,6 +256,6 @@ export function destroyTray() {
 
     tray.destroy();
     tray = null;
-    console.log("��️ 系统托盘已销毁");
+    console.log("✅ 系统托盘已销毁");
   }
 }
