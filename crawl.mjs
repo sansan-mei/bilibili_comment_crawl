@@ -142,9 +142,9 @@ const crawlBilibiliComments = async (forceBVid) => {
       /** @param {BilibiliSubtitle} v */
       (v) => v.lan.includes("zh")
     );
-    console.log(`已获取到官方字幕URL：${subtitleUrl.subtitle_url}`);
 
-    if (subtitleUrl.subtitle_url) {
+    if (subtitleUrl?.subtitle_url) {
+      console.log(`已获取到官方字幕URL：${subtitleUrl.subtitle_url}`);
       const { data: subtitleResponse } = await axios.get(
         getSubtitleUrl(subtitleUrl.subtitle_url),
         {
