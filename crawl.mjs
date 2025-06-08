@@ -2,6 +2,7 @@
 
 import {
   convertToSRT,
+  createNotice,
   delay,
   ensureDirectoryExists,
   existFile,
@@ -19,6 +20,7 @@ import {
   getSubtitleListUrl,
   getSubtitlesPath,
   getSubtitleUrl,
+  isElectron,
   logStart,
   processVideoAndAudio,
   processVideoDetail,
@@ -328,6 +330,13 @@ const crawlBilibiliComments = async (forceBVid) => {
     const videoUrl = videoInfoResponse.data.durl?.[0]?.url;
 
     await processVideoAndAudio(outputDir, videoUrl, getHeaders());
+  }
+
+  if (isElectron()) {
+    createNotice({
+      title: "哔哩哔哩脚本",
+      body: `${detail.title}-收集成功`,
+    });
   }
 
   queue.delete(bvid);

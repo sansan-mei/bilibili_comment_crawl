@@ -1,4 +1,5 @@
 import { execSync } from "child_process";
+import { Notification } from "electron";
 import os from "os";
 
 /**
@@ -41,4 +42,20 @@ export async function killPortProcess(port) {
   } catch (e) {
     // 没有占用时会报错，忽略即可
   }
+}
+
+/**
+ * @param {import("electron").NotificationConstructorOptions} obj
+ * @param {number} [time=1500]
+ */
+export async function createNotice(obj, time = 1500) {
+  const notice = new Notification({
+    ...obj,
+  });
+
+  notice.show();
+
+  setTimeout(() => {
+    notice.close();
+  }, time);
 }

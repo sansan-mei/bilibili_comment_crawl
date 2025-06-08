@@ -1,7 +1,7 @@
 import { crawlScript } from "#crawl";
-import { killPortProcess } from "#utils/electron";
+import { createNotice, killPortProcess } from "#utils/electron";
 import { config } from "dotenv";
-import { app, Notification } from "electron";
+import { app } from "electron";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -18,10 +18,10 @@ app.whenReady().then(async () => {
 
   await crawlScript();
 
-  new Notification({
+  createNotice({
     title: "哔哩哔哩脚本",
     body: "哔哩哔哩脚本启动成功",
-  }).show();
+  });
 });
 
 // 防止应用在所有窗口关闭时退出（保持托盘运行）
