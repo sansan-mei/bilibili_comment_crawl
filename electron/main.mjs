@@ -28,3 +28,23 @@ app.whenReady().then(async () => {
 app.on("window-all-closed", (/** @type {any} */ event) => {
   event.preventDefault();
 });
+
+// 监听未捕获的 Promise 错误
+process.on("unhandledRejection", (reason) => {
+  console.error("未处理的 Promise 错误:", reason);
+  createNotice({
+    title: "系统错误",
+    body: `Promise 错误: ${
+      reason instanceof Error ? reason.message : String(reason)
+    }`,
+  });
+});
+
+// 监听未捕获的异常
+process.on("uncaughtException", (error) => {
+  console.error("未捕获的异常:", error);
+  createNotice({
+    title: "系统异常",
+    body: `异常: ${error.message}`,
+  });
+});
