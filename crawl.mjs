@@ -238,7 +238,7 @@ const crawlBilibiliComments = async (forceBVid) => {
               time: reply.ctime,
               rpid: reply.rpid,
               like: reply.like,
-              reply_control: reply.control,
+              reply_control: reply.reply_control,
             })
           );
           commentObj.childList = childComments;
