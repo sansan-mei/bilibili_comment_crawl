@@ -155,6 +155,7 @@ const crawlBilibiliComments = async (forceBVid) => {
       /** @type {Array<BilibiliSubtitleDetail>} */
       const subtitleDetail = subtitleResponse.body;
       zimuTextContent = convertToSRT(subtitleDetail);
+      fs.writeFileSync(subtitlesPath, zimuTextContent, { encoding: "utf-8" });
     } else {
       console.log("没有获取到官方字幕URL，跳过爬取");
     }

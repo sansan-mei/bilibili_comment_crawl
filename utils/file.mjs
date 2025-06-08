@@ -64,11 +64,6 @@ export const saveCommentData = async (
     encoding: "utf-8",
   });
 
-  // 保存字幕到文件
-  fs.writeFileSync(subtitlesPath, zimuTextContent, {
-    encoding: "utf-8",
-  });
-
   // 合并所有内容并保存
   const allTxtContent = mergeTxt(
     JSON.stringify(detail),
