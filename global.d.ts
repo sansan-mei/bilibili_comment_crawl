@@ -25,6 +25,12 @@ declare type IComment = {
   childList: Array<IComment>;
   replyCount: number;
   like: number;
+  member: AnyObject;
+  reply_control: {
+    location: string;
+    time_desc: string;
+    translation_switch: number;
+  };
 };
 
 declare type BilibiliDetail = {

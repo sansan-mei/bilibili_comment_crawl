@@ -9,17 +9,21 @@ import { formatTime } from "./utils.mjs";
 export const formatCommentsToTxt = (comments) => {
   return comments
     .map((c) => {
+      const location = c?.reply_control?.location || "未知";
+      const time = c?.reply_control?.time_desc || "未知";
+
       // 主评论
-      let commentText = `${c.author}：${c.sex}：时间-${c.time}：内容-${c.content}：点赞-${c.like}：回复-${c.replyCount}`;
+      let commentText = `${c.author}：${c.sex}：时间-${c.time}：内容-${c.content}：点赞-${c.like}：回复-${c.replyCount}：地区-${location}：回复时间-${time}`;
 
       // 添加子评论（如果有）
       if (c.childList && c.childList.length > 0) {
         const childComments = c.childList
           // @ts-ignore
-          .map(
-            (child) =>
-              `  └─ ${child.author}：${child.sex}：时间-${child.time}：内容-${child.content}：点赞-${child.like}`
-          )
+          .map((child) => {
+            const _location = child?.reply_control?.location || "未知";
+            const _time = child?.reply_control?.time_desc || "未知";
+            return `  └─ ${child.author}：${child.sex}：时间-${child.time}：内容-${child.content}：点赞-${child.like}：地区-${_location}：回复时间-${_time}`;
+          })
           .join("\n");
         commentText += "\n" + childComments;
       }
