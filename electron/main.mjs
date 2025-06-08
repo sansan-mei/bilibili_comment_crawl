@@ -20,7 +20,7 @@ app.whenReady().then(async () => {
 
   createNotice({
     title: "哔哩哔哩脚本",
-    body: "哔哩哔哩脚本启动成功",
+    body: "启动成功",
   });
 });
 
