@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import {
+  convertToSRT,
   delay,
   ensureDirectoryExists,
   existFile,
@@ -9,12 +10,14 @@ import {
   getBilibiliDetailUrl,
   getBilibiliVideoStreamUrl,
   getBVid,
+  getDanmakuPath,
   getHeaders,
   getMainCommentUrl,
   getOid,
   getReplyUrl,
   getStaticPath,
   getSubtitleListUrl,
+  getSubtitlesPath,
   getSubtitleUrl,
   logStart,
   processVideoAndAudio,
@@ -23,10 +26,9 @@ import {
   saveCommentData,
   startInteractiveMode,
 } from "#utils/index";
-import { convertToSRT } from "#utils/subtitle";
 import axios from "axios";
 import fs from "fs";
-import path from "path";
+import { join } from "path";
 
 /** @type {Map<string,'running' | 'ready'>} */
 const queue = new Map();
@@ -40,8 +42,6 @@ const crawlBilibiliComments = async (forceBVid) => {
   // 使用强制传入的BV号或尝试从环境变量获取
   const bvid = getBVid(forceBVid);
 
-  /** @type {Array<IComment>} */
-  const comments = [];
   /** @type {BilibiliDetail} */
   const detail = {
     title: "",
@@ -95,17 +95,19 @@ const crawlBilibiliComments = async (forceBVid) => {
 
   // 使用统一的路径获取函数
   const basePath = await getStaticPath();
-  const outputDir = path.join(basePath, `${sanitizedTitle}-${detail.oid}`);
+  const outputDir = join(basePath, `${sanitizedTitle}-${detail.oid}`);
   console.log(`数据保存到: ${outputDir}`);
 
-  const videoPath = path.join(outputDir, `current.mp4`);
-  const audioPath = path.join(outputDir, `current.mp3`);
-  const subtitlesPath = path.join(outputDir, `subtitles.txt`);
+  const danmakuFilePath = getDanmakuPath(outputDir);
+  const subtitlesPath = getSubtitlesPath(outputDir);
 
   ensureDirectoryExists(outputDir);
 
-  const danmakuFilePath = path.join(outputDir, "bilibili_danmaku.txt");
+  /** @type {Array<IComment>} */
+  const comments = [];
+  /** @type {string} */
   let danmakuTxtContent = "";
+  /** @type {string} */
   let zimuTextContent = "";
 
   /** @做一个函数，当读取到的弹幕数量有detail.danmaku的80%时就不读取 */
@@ -153,10 +155,6 @@ const crawlBilibiliComments = async (forceBVid) => {
       /** @type {Array<BilibiliSubtitleDetail>} */
       const subtitleDetail = subtitleResponse.body;
       zimuTextContent = convertToSRT(subtitleDetail);
-      fs.writeFileSync(subtitlesPath, zimuTextContent, {
-        encoding: "utf-8",
-      });
-      console.log(`已保存官方字幕`);
     } else {
       console.log("没有获取到官方字幕URL，跳过爬取");
     }
@@ -172,7 +170,7 @@ const crawlBilibiliComments = async (forceBVid) => {
     `目标获取评论数: ${targetCommentCount}条（总评论数的${base * 100}%）`
   );
 
-  const hasAll = existFile(path.join(outputDir, "bilibili_all.txt"));
+  const hasAll = existFile(join(outputDir, "bilibili_all.txt"));
   while (true) {
     if (hasAll) {
       console.log("已存在bilibili_all.txt文件，跳过爬取");
@@ -325,13 +323,7 @@ const crawlBilibiliComments = async (forceBVid) => {
 
     const videoUrl = videoInfoResponse.data.durl?.[0]?.url;
 
-    await processVideoAndAudio(
-      videoPath,
-      audioPath,
-      videoUrl,
-      subtitlesPath,
-      getHeaders()
-    );
+    await processVideoAndAudio(outputDir, videoUrl, getHeaders());
   }
 
   queue.delete(bvid);

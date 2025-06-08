@@ -29,3 +29,9 @@ export * from "./speechToText.mjs";
 
 // 导出Electron相关函数
 export * from "./electron.mjs";
+
+// 导出路径相关函数
+export * from "./path.mjs";
+
+// 导出字幕相关函数
+export * from "./subtitle.mjs";

@@ -1,6 +1,7 @@
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 import ffmpeg from "fluent-ffmpeg";
 import { existFile } from "./file.mjs";
+import { getAudioPath, getSubtitlesPath, getVideoPath } from "./path.mjs";
 import { generateSubtitles } from "./speechToText.mjs";
 import { downloadVideo } from "./utils.mjs";
 
@@ -32,20 +33,15 @@ export { ffmpeg };
 
 /**
  * 处理视频和音频
- * @param {string} videoPath - 视频路径
- * @param {string} audioPath - 音频路径
+ * @param {string} outputDir - 输出目录
  * @param {string} videoUrl - 视频URL
- * @param {string} subtitlesPath - 字幕路径
  * @param {Object} header - 请求头
  */
-export const processVideoAndAudio = async (
-  videoPath,
-  audioPath,
-  videoUrl,
-  subtitlesPath,
-  header
-) => {
+export const processVideoAndAudio = async (outputDir, videoUrl, header) => {
   try {
+    const videoPath = getVideoPath(outputDir);
+    const audioPath = getAudioPath(outputDir);
+    const subtitlesPath = getSubtitlesPath(outputDir);
     // 检查视频和音频是否已存在
     const hasVideo = existFile(videoPath);
     const hasAudio = existFile(audioPath);
@@ -82,11 +78,16 @@ export const processVideoAndAudio = async (
       try {
         console.log("\n================================");
         console.log(`开始生成字幕`);
-        await generateSubtitles(audioPath, subtitlesPath, process.env.MODEL_PATH);
+        await generateSubtitles(
+          audioPath,
+          subtitlesPath,
+          process.env.MODEL_PATH
+        );
         console.log(`字幕生成完成并保存到: ${subtitlesPath}`);
         console.log("===============================\n");
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         console.warn(`字幕生成失败: ${errorMessage}`);
         console.log(`继续处理其他任务...`);
       }

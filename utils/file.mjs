@@ -1,15 +1,22 @@
 // 文件系统操作相关函数
-import fs from "fs";
-import path from "path";
-import { formatCommentsToTxt, mergeTxt } from "./format.mjs";
+import fs, { existsSync, mkdirSync } from "fs";
+import {
+  formatCommentsToTxt,
+  getAllPath,
+  getCommentPath,
+  getDanmakuPath,
+  getDetailPath,
+  getSubtitlesPath,
+  mergeTxt,
+} from "./index.mjs";
 
 /**
  * 确保目录存在
  * @param {string} dirPath - 目录路径
  */
 export const ensureDirectoryExists = (dirPath) => {
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
+  if (!existsSync(dirPath)) {
+    mkdirSync(dirPath, { recursive: true });
   }
 };
 
@@ -19,7 +26,7 @@ export const ensureDirectoryExists = (dirPath) => {
  * @returns {boolean} - 文件是否存在
  */
 export const existFile = (filePath) => {
-  return fs.existsSync(filePath);
+  return existsSync(filePath);
 };
 
 /**
@@ -38,10 +45,12 @@ export const saveCommentData = async (
   danmakuTxtContent,
   zimuTextContent
 ) => {
-  const allPath = path.join(outputDir, "bilibili_all.txt");
-  const commentPath = path.join(outputDir, "bilibili_comment.txt");
-  const detailPath = path.join(outputDir, "bilibili_detail.json");
-  const danmakuPath = path.join(outputDir, "bilibili_danmaku.txt");
+  const allPath = getAllPath(outputDir);
+  const commentPath = getCommentPath(outputDir);
+  const detailPath = getDetailPath(outputDir);
+  const danmakuPath = getDanmakuPath(outputDir);
+  const subtitlesPath = getSubtitlesPath(outputDir);
+
   // 格式化评论为文本
   const txtContent = formatCommentsToTxt(comments);
 
@@ -52,6 +61,11 @@ export const saveCommentData = async (
 
   // 保存视频详情到文件
   fs.writeFileSync(detailPath, JSON.stringify(detail, null, 2), {
+    encoding: "utf-8",
+  });
+
+  // 保存字幕到文件
+  fs.writeFileSync(subtitlesPath, zimuTextContent, {
     encoding: "utf-8",
   });
 
