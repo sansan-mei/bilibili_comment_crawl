@@ -48,7 +48,7 @@ export async function killPortProcess(port) {
  * @param {import("electron").NotificationConstructorOptions} obj
  * @param {number} [time=1500]
  */
-export async function createNotice(obj, time = 1500) {
+export async function createNotice(obj, time = 3000) {
   const notice = new Notification({
     ...obj,
   });
