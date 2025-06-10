@@ -35,3 +35,6 @@ export * from "./path.mjs";
 
 // 导出字幕相关函数
 export * from "./subtitle.mjs";
+
+// 导出通知相关函数
+export * from "./notifier.mjs";

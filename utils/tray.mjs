@@ -6,6 +6,7 @@ import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { listCrawledVideos, openCrawledVideo, showHelp } from "./cli.mjs";
+import { notifier } from "./notifier.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -49,9 +50,10 @@ async function checkAutoLaunchStatus() {
   try {
     return await launcher.isEnabled();
   } catch (error) {
-    console.log(
-      "检查自启动状态失败:",
-      error instanceof Error ? error.message : String(error)
+    notifier.log(
+      `检查自启动状态失败:${
+        error instanceof Error ? error.message : String(error)
+      }`
     );
     return false;
   }
@@ -63,7 +65,7 @@ async function checkAutoLaunchStatus() {
 async function toggleAutoLaunch() {
   const launcher = initAutoLauncher();
   if (!launcher) {
-    console.log("自启动功能不可用");
+    notifier.log("自启动功能不可用");
     return;
   }
 
@@ -71,17 +73,18 @@ async function toggleAutoLaunch() {
     const isEnabled = await launcher.isEnabled();
     if (isEnabled) {
       await launcher.disable();
-      console.log("✅ 已关闭开机自启动");
+      notifier.log("✅ 已关闭开机自启动");
     } else {
       await launcher.enable();
-      console.log("✅ 已开启开机自启动");
+      notifier.log("✅ 已开启开机自启动");
     }
     // 重新创建菜单以更新状态显示
     createTrayMenu();
   } catch (error) {
-    console.log(
-      "切换自启动状态失败:",
-      error instanceof Error ? error.message : String(error)
+    notifier.log(
+      `切换自启动状态失败:${
+        error instanceof Error ? error.message : String(error)
+      }`
     );
   }
 }
@@ -110,12 +113,12 @@ export async function createSystemTray() {
       icon.setTemplateImage(true);
     }
   } catch (error) {
-    console.log("图标文件不存在，使用默认图标");
+    notifier.log("图标文件不存在，使用默认图标");
     icon = nativeImage.createEmpty();
   }
 
   tray = new Tray(icon);
-  tray.setToolTip("Bilibili 评论爬虫");
+  tray.setToolTip("Bilibili 爬虫");
 
   // 针对macOS的特殊处理
   if (process.platform === "darwin") {
@@ -124,17 +127,17 @@ export async function createSystemTray() {
 
     // 监听屏幕变化事件，确保托盘在屏幕切换时仍然可用
     screen.on("display-added", () => {
-      console.log("检测到新显示器，重新初始化托盘");
+      notifier.log("检测到新显示器，重新初始化托盘");
       refreshTray();
     });
 
     screen.on("display-removed", () => {
-      console.log("显示器已移除，重新初始化托盘");
+      notifier.log("显示器已移除，重新初始化托盘");
       refreshTray();
     });
 
     screen.on("display-metrics-changed", () => {
-      console.log("显示器配置已更改，重新初始化托盘");
+      notifier.log("显示器配置已更改，重新初始化托盘");
       refreshTray();
     });
   }
@@ -149,36 +152,34 @@ export async function createSystemTray() {
 
   // 右键点击事件（主要用于调试）
   tray.on("right-click", () => {
-    console.log("右键点击托盘图标");
+    notifier.log("右键点击托盘图标");
   });
 
-  console.log("✅ 系统托盘已创建");
-  console.log(`📺 检测到 ${screen.getAllDisplays().length} 个显示器`);
+  notifier.log("✅ 系统托盘已创建");
+  notifier.log(`📺 检测到 ${screen.getAllDisplays().length} 个显示器`);
 }
 
 /**
  * 刷新托盘 - 用于屏幕配置更改后重新初始化
  */
-function refreshTray() {
+export function refreshTray() {
   if (tray) {
-    // 重新创建菜单（因为Tray没有getContextMenu方法）
-    console.log(
-      `🔄 刷新托盘菜单，当前屏幕数量: ${screen.getAllDisplays().length}`
-    );
     createTrayMenu();
   }
 }
 
 /**
  * 创建托盘菜单的辅助函数
+ * @param {Electron.MenuItemConstructorOptions} [menu]
  */
-async function createTrayMenu() {
+export async function createTrayMenu(menu) {
   if (!tray) return;
 
   // 检查自启动状态
   const isAutoLaunchEnabled = await checkAutoLaunchStatus();
 
   const contextMenu = Menu.buildFromTemplate([
+    ...(menu ? [menu] : []),
     {
       label: "查看已爬取视频列表",
       click: async () => {
@@ -206,35 +207,9 @@ async function createTrayMenu() {
     },
     { type: "separator" },
     {
-      label: `当前屏幕数量: ${screen.getAllDisplays().length}`,
-      enabled: false,
-    },
-    {
-      label: "显示器信息",
-      click: () => {
-        const displays = screen.getAllDisplays();
-        console.log("\n=== 显示器信息 ===");
-        displays.forEach((display, index) => {
-          console.log(`屏幕 ${index + 1}:`);
-          console.log(
-            `  - 尺寸: ${display.bounds.width}x${display.bounds.height}`
-          );
-          console.log(`  - 位置: (${display.bounds.x}, ${display.bounds.y})`);
-          console.log(
-            `  - 主屏幕: ${
-              display.bounds.x === 0 && display.bounds.y === 0 ? "是" : "否"
-            }`
-          );
-          console.log(`  - DPI: ${display.scaleFactor}x`);
-        });
-        console.log("=================\n");
-      },
-    },
-    { type: "separator" },
-    {
       label: "退出程序",
       click: () => {
-        console.log("程序已退出");
+        notifier.log("程序已退出");
         destroyTray();
         app.quit();
       },
@@ -256,6 +231,6 @@ export function destroyTray() {
 
     tray.destroy();
     tray = null;
-    console.log("✅ 系统托盘已销毁");
+    notifier.log("✅ 系统托盘已销毁");
   }
 }

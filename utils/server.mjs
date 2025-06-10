@@ -1,5 +1,6 @@
 import Hapi from "@hapi/hapi";
 import Inert from "@hapi/inert";
+import { notifier } from "./notifier.mjs";
 import { getStaticPath } from "./utils.mjs";
 
 /**
@@ -62,9 +63,9 @@ async function logStart(_handle) {
   });
 
   await app.start();
-  console.log("\n==================================================");
-  console.log("Hapi服务器启动成功");
-  console.log("==================================================\n");
+  notifier.log("\n==================================================");
+  notifier.log("Hapi服务器启动成功");
+  notifier.log("==================================================\n");
   handle = _handle;
 }
 

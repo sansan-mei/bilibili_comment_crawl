@@ -1,6 +1,6 @@
 import { execSync } from "child_process";
-import { Notification } from "electron";
 import os from "os";
+import { notifier } from "./notifier.mjs";
 
 /**
  * 释放指定端口
@@ -21,7 +21,7 @@ export async function killPortProcess(port) {
       pids.forEach((pid) => {
         try {
           execSync(`taskkill /PID ${pid} /F`);
-          console.log(`已杀死占用端口${port}的进程 PID: ${pid}`);
+          notifier.log(`已杀死占用端口${port}的进程 PID: ${pid}`);
         } catch (e) {
           // 忽略找不到进程的报错
         }
@@ -33,7 +33,7 @@ export async function killPortProcess(port) {
       pids.forEach((pid) => {
         try {
           execSync(`kill -9 ${pid}`);
-          console.log(`已杀死占用端口${port}的进程 PID: ${pid}`);
+          notifier.log(`已杀死占用端口${port}的进程 PID: ${pid}`);
         } catch (e) {
           // 忽略找不到进程的报错
         }
@@ -49,6 +49,7 @@ export async function killPortProcess(port) {
  * @param {number} [time=1500]
  */
 export async function createNotice(obj, time = 3500) {
+  const { Notification } = await import("electron");
   const notice = new Notification({
     ...obj,
   });

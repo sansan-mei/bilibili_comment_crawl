@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { connect, launch } from "puppeteer-core";
 import UserAgent from "user-agents";
-import { delay } from "./index.mjs";
+import { delay, notifier } from "./index.mjs";
 
 // 尝试连接到已打开的Chrome浏览器
 async function connectBrowser() {
@@ -12,12 +12,12 @@ async function connectBrowser() {
       browserURL: "http://127.0.0.1:9222",
       defaultViewport: null,
     });
-    console.log("成功连接到已打开的Chrome浏览器");
+    notifier.log("成功连接到已打开的Chrome浏览器");
     return browser;
   } catch (error) {
-    console.log("无法连接到已打开的Chrome浏览器，将启动新的浏览器实例");
+    notifier.log("无法连接到已打开的Chrome浏览器，将启动新的浏览器实例");
     // 直接将错误转换为字符串
-    console.log(String(error));
+    notifier.log(String(error));
 
     // 如果连接失败，则启动新的浏览器实例
     // 处理跨系统路径问题
@@ -125,13 +125,13 @@ class Browser {
     if (!this.browser) {
       // 如果浏览器正在初始化中，等待初始化完成
       if (this.browserInitializing) {
-        console.log("浏览器正在初始化中，等待...");
+        notifier.log("浏览器正在初始化中，等待...");
         while (this.browserInitializing) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
         }
       } else if (!this.browserInitialized) {
         // 如果浏览器尚未初始化，重新初始化
-        console.log("浏览器未初始化，开始初始化...");
+        notifier.log("浏览器未初始化，开始初始化...");
       }
     }
 
@@ -174,7 +174,7 @@ class Browser {
       const absoluteFilePath = path.isAbsolute(filePath)
         ? filePath
         : path.resolve(process.cwd(), filePath);
-      console.log(`准备上传文件: ${absoluteFilePath}`);
+      notifier.log(`准备上传文件: ${absoluteFilePath}`);
 
       // 等待文件输入元素出现在页面上
       /** @type {AnyObject | null} */
@@ -184,7 +184,7 @@ class Browser {
       }
 
       await fileInput.uploadFile(absoluteFilePath);
-      console.log(`成功上传文件: ${absoluteFilePath}`);
+      notifier.log(`成功上传文件: ${absoluteFilePath}`);
       return true;
     } catch (error) {
       const errorMessage =
@@ -205,7 +205,7 @@ class Browser {
       throw new Error("提交按钮未找到");
     }
     await submitButton.click();
-    console.log("成功点击提交按钮");
+    notifier.log("成功点击提交按钮");
     this.browser?.disconnect();
   }
 

@@ -4,6 +4,7 @@ import fs from "fs";
 import inquirer from "inquirer";
 import path from "path";
 import { crawlBilibiliComments } from "../crawl.mjs";
+import { notifier } from "./notifier.mjs";
 import { getStaticPath, isElectron } from "./utils.mjs";
 
 /**
@@ -12,15 +13,15 @@ import { getStaticPath, isElectron } from "./utils.mjs";
 export async function startInteractiveMode() {
   // 判断如果是在 Electron 环境，就创建系统托盘
   if (isElectron()) {
-    console.log("运行在 Electron 环境，请使用系统托盘功能");
+    notifier.log("运行在 Electron 环境，请使用系统托盘功能");
     try {
       const { createSystemTray } = await import("./tray.mjs");
       await createSystemTray();
-      console.log("系统托盘已创建，可以最小化到托盘");
+      notifier.log("系统托盘已创建，可以最小化到托盘");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      console.log("托盘创建失败，使用普通命令行模式:", errorMessage);
+      notifier.log("托盘创建失败，使用普通命令行模式:", errorMessage);
       promptForAction();
     }
   } else {
@@ -63,7 +64,7 @@ export async function promptForAction() {
         openCrawledVideo();
         break;
       case "exit":
-        console.log("程序已退出");
+        notifier.log("程序已退出");
         process.exit(0);
         break;
     }
@@ -94,7 +95,7 @@ export async function promptForBVid() {
 
   try {
     await crawlBilibiliComments(bvid);
-    console.log(`视频 ${bvid} 的评论爬取完成`);
+    notifier.log(`视频 ${bvid} 的评论爬取完成`);
   } catch (error) {
     console.error(`爬取视频 ${bvid} 失败:`, error);
   }
@@ -113,7 +114,7 @@ export async function listCrawledVideos() {
     .filter((dir) => /\d+$/.test(dir));
 
   if (dirs.length === 0) {
-    console.log("\n暂无爬取记录");
+    notifier.log("\n暂无爬取记录");
     promptForAction();
     return;
   }
@@ -163,17 +164,17 @@ export async function listCrawledVideos() {
           encoding: "utf-8",
         });
         const detail = JSON.parse(detailContent);
-        console.log("\n视频详情:");
-        console.log(`标题: ${detail.title}`);
-        console.log(`观看次数: ${detail.view}`);
-        console.log(`评论数: ${detail.reply}`);
-        console.log(`弹幕数: ${detail.danmaku}`);
-        console.log(`点赞数: ${detail.like}`);
-        console.log(`投币数: ${detail.coin}`);
-        console.log(`收藏数: ${detail.favorite}`);
-        console.log(`分享数: ${detail.share}\n`);
+        notifier.log("\n视频详情:");
+        notifier.log(`标题: ${detail.title}`);
+        notifier.log(`观看次数: ${detail.view}`);
+        notifier.log(`评论数: ${detail.reply}`);
+        notifier.log(`弹幕数: ${detail.danmaku}`);
+        notifier.log(`点赞数: ${detail.like}`);
+        notifier.log(`投币数: ${detail.coin}`);
+        notifier.log(`收藏数: ${detail.favorite}`);
+        notifier.log(`分享数: ${detail.share}\n`);
       } else {
-        console.log("未找到视频详情文件");
+        notifier.log("未找到视频详情文件");
       }
     } catch (error) {
       console.error("读取视频详情失败:", error);
@@ -187,12 +188,12 @@ export async function listCrawledVideos() {
  * 显示帮助信息
  */
 export function showHelp() {
-  console.log("\n帮助信息:");
-  console.log("1. 爬取新视频 - 输入B站视频BV号，爬取视频评论和弹幕");
-  console.log("2. 查看已爬取视频列表 - 显示已爬取的视频列表，可以查看详情");
-  console.log("3. 浏览器打开文件列表 - 浏览器打开已爬取的视频文件列表");
-  console.log("4. 帮助信息 - 显示本帮助信息");
-  console.log("5. 退出程序 - 退出爬虫程序\n");
+  notifier.log("\n帮助信息:");
+  notifier.log("1. 爬取新视频 - 输入B站视频BV号，爬取视频评论和弹幕");
+  notifier.log("2. 查看已爬取视频列表 - 显示已爬取的视频列表，可以查看详情");
+  notifier.log("3. 浏览器打开文件列表 - 浏览器打开已爬取的视频文件列表");
+  notifier.log("4. 帮助信息 - 显示本帮助信息");
+  notifier.log("5. 退出程序 - 退出爬虫程序\n");
 
   promptForAction();
 }

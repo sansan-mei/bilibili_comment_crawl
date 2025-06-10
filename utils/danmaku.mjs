@@ -1,5 +1,6 @@
 // 弹幕相关功能
 import { DmSegMobileReply } from "#export/index";
+import { notifier } from "./notifier.mjs";
 import { delay, getHeaders } from "./utils.mjs";
 
 /**
@@ -108,7 +109,7 @@ export const fetchDanmaku = async (cid, totalDanmaku) => {
 
   try {
     while (danmus.length < targetCount) {
-      console.log(
+      notifier.log(
         `正在获取第${page}页弹幕，当前已获取${danmus.length}条，目标${targetCount}条`
       );
 
@@ -118,7 +119,7 @@ export const fetchDanmaku = async (cid, totalDanmaku) => {
       await delay(1000);
 
       if (!pageDanmus || pageDanmus.length === 0) {
-        console.log(`第${page}页没有弹幕，可能已到达末尾`);
+        notifier.log(`第${page}页没有弹幕，可能已到达末尾`);
         break;
       }
 
@@ -127,7 +128,7 @@ export const fetchDanmaku = async (cid, totalDanmaku) => {
 
       // 如果已经获取了足够多的弹幕或者没有更多弹幕，就退出循环
       if (danmus.length >= targetCount) {
-        console.log(
+        notifier.log(
           `已获取足够的弹幕(${danmus.length}/${totalDanmaku})，停止获取`
         );
         break;
@@ -136,7 +137,7 @@ export const fetchDanmaku = async (cid, totalDanmaku) => {
 
     // 按时间排序弹幕
     danmus.sort((a, b) => a.time - b.time);
-    console.log("弹幕已按时间排序");
+    notifier.log("弹幕已按时间排序");
 
     return danmus;
   } catch (error) {

@@ -1,3 +1,4 @@
+import { notifier } from "#utils/notifier";
 import { delay } from "#utils/utils";
 import { spawn } from "child_process";
 import os from "node:os";
@@ -6,7 +7,7 @@ buildApp();
 
 async function buildApp() {
   await delay(2000);
-  console.log("开始构建应用...");
+  notifier.log("开始构建应用...");
 
   // 根据当前平台决定构建参数
   const buildArgs = ["build", "--publish", "never"];
@@ -41,10 +42,10 @@ async function buildApp() {
     });
 
     buildProcess.on("close", (code) => {
-      console.log(`构建进程已关闭，退出码: ${code}`);
+      notifier.log(`构建进程已关闭，退出码: ${code}`);
 
       if (code === 0) {
-        console.log("✅ 构建成功！");
+        notifier.log("✅ 构建成功！");
         resolve({
           success: true,
           code,
@@ -52,8 +53,8 @@ async function buildApp() {
           errorOutput,
         });
       } else {
-        console.log("❌ 构建失败！");
-        console.log("错误输出:", errorOutput);
+        notifier.log("❌ 构建失败！");
+        notifier.log(errorOutput);
         resolve({
           success: false,
           code,

@@ -6,6 +6,7 @@ import { createWriteStream } from "node:fs";
 import path, { normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import UserAgent from "user-agents";
+import { notifier } from "./notifier.mjs";
 
 /**
  * 延时函数
@@ -113,7 +114,7 @@ export const extractVideoUrl = (data) => {
  */
 export const downloadVideo = async (url, videoPath, headers) => {
   try {
-    console.log(`\n开始下载视频到: ${videoPath}`);
+    notifier.log(`\n开始下载视频到: ${videoPath}`);
 
     const response = await axios.get(url, {
       responseType: "stream",
@@ -130,7 +131,7 @@ export const downloadVideo = async (url, videoPath, headers) => {
         // 验证文件是否存在和大小
         if (fs.existsSync(videoPath)) {
           const stats = fs.statSync(videoPath);
-          console.log(`文件大小: ${stats.size} 字节`);
+          notifier.log(`文件大小: ${stats.size} 字节`);
         } else {
           console.error(`文件下载完成但无法找到: ${videoPath}`);
         }

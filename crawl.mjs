@@ -22,6 +22,7 @@ import {
   getSubtitleUrl,
   isElectron,
   logStart,
+  notifier,
   processVideoAndAudio,
   processVideoDetail,
   sanitizeFilename,
@@ -71,24 +72,24 @@ const crawlBilibiliComments = async (forceBVid) => {
   if (taskList.includes("running") && forceBVid) {
     !queue.has(bvid) &&
       queue.set(bvid, "ready") &&
-      console.log("\n检测到任务进入队列");
+      notifier.log("\n检测到任务进入队列");
     return;
   }
 
   if (!bvid) {
-    console.log("未提供有效的BV号，无法爬取视频");
+    notifier.log("未提供有效的BV号，无法爬取视频");
     return;
   }
 
   queue.set(bvid, "running");
-  console.log(`开始爬取视频 ${bvid} 的评论`);
+  notifier.log(`开始爬取视频 ${bvid} 的评论`);
 
   const { data: detailResponse } = await axios.get(getBilibiliDetailUrl(bvid), {
     headers: getHeaders(),
   });
 
   processVideoDetail(detail, detailResponse.data);
-  console.log(`已获取到视频详情：【${detail.title}】\n`);
+  notifier.log(`已获取到视频详情：【${detail.title}】\n`);
 
   process.env.OID = detail.oid.toString();
 
@@ -98,7 +99,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   // 使用统一的路径获取函数
   const basePath = await getStaticPath();
   const outputDir = join(basePath, `${sanitizedTitle}-${detail.oid}`);
-  console.log(`数据保存到: ${outputDir}`);
+  notifier.log(`数据保存到: ${outputDir}`);
 
   const danmakuFilePath = getDanmakuPath(outputDir);
   const subtitlesPath = getSubtitlesPath(outputDir);
@@ -112,10 +113,12 @@ const crawlBilibiliComments = async (forceBVid) => {
   /** @type {string} */
   let zimuTextContent = "";
 
-  /** @做一个函数，当读取到的弹幕数量有detail.danmaku的80%时就不读取 */
+  const notifierTitle = `【${detail.title.slice(0, 7)}】`;
+
+  notifier.info(`${notifierTitle} 正在获取弹幕`);
   if (!existFile(danmakuFilePath)) {
     const danmus = await fetchDanmaku(detail.cid, detail.danmaku);
-    console.log(
+    notifier.log(
       `成功获取${danmus.length}条弹幕，占总弹幕数的${(
         (danmus.length / detail.danmaku) *
         100
@@ -125,14 +128,16 @@ const crawlBilibiliComments = async (forceBVid) => {
     // 将弹幕转换为简单的文本格式
     danmakuTxtContent = formatDanmakuToTxt(danmus);
     fs.writeFileSync(danmakuFilePath, danmakuTxtContent, { encoding: "utf-8" });
-    console.log(`评论和弹幕已保存到目录: ${outputDir}`);
+    notifier.log(`评论和弹幕已保存到目录: ${outputDir}`);
   } else {
-    console.log(`弹幕已存在，跳过获取弹幕`);
+    notifier.log(`弹幕已存在，跳过获取弹幕`);
     danmakuTxtContent = fs.readFileSync(danmakuFilePath, { encoding: "utf-8" });
   }
+  notifier.info(`${notifierTitle} 弹幕获取完成`);
 
+  notifier.info(`${notifierTitle} 正在获取字幕`);
   if (!existFile(subtitlesPath)) {
-    console.log(`开始爬取官方字幕`);
+    notifier.log(`开始爬取官方字幕`);
     const { data: subtitleListResponse } = await axios.get(
       getSubtitleListUrl(bvid, detail.cid, detail.oid),
       {
@@ -146,39 +151,41 @@ const crawlBilibiliComments = async (forceBVid) => {
     );
 
     if (subtitleUrl?.subtitle_url) {
-      console.log(`已获取到官方字幕URL：${subtitleUrl.subtitle_url}`);
+      notifier.log(`已获取到官方字幕URL：${subtitleUrl.subtitle_url}`);
       const { data: subtitleResponse } = await axios.get(
         getSubtitleUrl(subtitleUrl.subtitle_url),
         {
           headers: getHeaders(),
         }
       );
-      console.log(`已获取到官方字幕内容`);
+      notifier.log(`已获取到官方字幕内容`);
       /** @type {Array<BilibiliSubtitleDetail>} */
       const subtitleDetail = subtitleResponse.body;
       zimuTextContent = convertToSRT(subtitleDetail);
       fs.writeFileSync(subtitlesPath, zimuTextContent, { encoding: "utf-8" });
     } else {
-      console.log("没有获取到官方字幕URL，跳过爬取");
+      notifier.log("没有获取到官方字幕URL，跳过爬取");
     }
   } else {
-    console.log(`已存在官方字幕，跳过爬取`);
+    notifier.log(`已存在官方字幕，跳过爬取`);
     zimuTextContent = fs.readFileSync(subtitlesPath, { encoding: "utf-8" });
   }
+  notifier.info(`${notifierTitle} 字幕获取完成`);
 
   /** @计算基数0.1-1 */
   const base = 1;
   const targetCommentCount = Math.floor(detail.reply * base);
-  console.log(
+  notifier.log(
     `目标获取评论数: ${targetCommentCount}条（总评论数的${base * 100}%）`
   );
 
   const hasAll = existFile(join(outputDir, "bilibili_all.txt"));
   while (true) {
     if (hasAll) {
-      console.log("已存在bilibili_all.txt文件，跳过爬取");
+      notifier.log("已存在bilibili_all.txt文件，跳过爬取");
       break;
     }
+    notifier.info(`${notifierTitle} 正在获取评论`);
     try {
       const response = await axios.get(getMainCommentUrl(i, getOid()), {
         headers: getHeaders(),
@@ -189,12 +196,12 @@ const crawlBilibiliComments = async (forceBVid) => {
       const responseData = response.data;
       const replies = responseData.data.replies;
       if (!responseData.data || !replies) {
-        console.log("没有查询到子评论，跳过");
+        notifier.log("没有查询到子评论，跳过");
         noRepliesCount++; // 增加计数器
 
         // 如果连续多次没有查询到评论，可能是cookies失效
         if (noRepliesCount >= MAX_NO_REPLIES) {
-          console.log(
+          notifier.log(
             `连续${MAX_NO_REPLIES}次没有查询到评论，请检查cookies是否失效`
           );
           break; // 退出循环
@@ -253,7 +260,7 @@ const crawlBilibiliComments = async (forceBVid) => {
         0
       );
 
-      console.log(
+      notifier.log(
         `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${
           comments.length + totalChildComments
         }条评论`
@@ -265,7 +272,7 @@ const crawlBilibiliComments = async (forceBVid) => {
         comments.reduce((acc, cur) => acc + cur.replyCount, 0);
 
       if (currentTotalComments >= targetCommentCount) {
-        console.log(
+        notifier.log(
           `已达到目标评论数量（${currentTotalComments}/${detail.reply}，${(
             (currentTotalComments / detail.reply) *
             100
@@ -276,7 +283,7 @@ const crawlBilibiliComments = async (forceBVid) => {
 
       // 调整爬虫策略，上一次评论总数和这一次评论总数进行比较，如果有改变说明有新数据，如果没改变说明数据全部搜集完毕，爬虫停止
       if (comments.length === preCommentLength) {
-        console.log("爬虫退出！！！");
+        notifier.log("爬虫退出！！！");
         break;
       } else {
         preCommentLength = comments.length;
@@ -287,7 +294,7 @@ const crawlBilibiliComments = async (forceBVid) => {
       // 添加重试计数器
       retryCount = (retryCount || 0) + 1;
       if (retryCount >= 3) {
-        console.log("已重试3次，停止爬取更多评论，开始保存已获取的数据");
+        notifier.log("已重试3次，停止爬取更多评论，开始保存已获取的数据");
         break;
       }
 
@@ -295,13 +302,9 @@ const crawlBilibiliComments = async (forceBVid) => {
     }
   }
 
-  console.log(
-    `搜集到${comments.length}条主评论，共计${
-      comments.length + comments.reduce((acc, cur) => acc + cur.replyCount, 0)
-    }条评论（包括子评论）`
-  );
+  notifier.info(`${notifierTitle} 评论获取完成`);
 
-  // 调用封装的函数保存数据
+  notifier.info(`${notifierTitle} 正在合并数据`);
   const { allPath } = await saveCommentData(
     outputDir,
     comments,
@@ -309,8 +312,7 @@ const crawlBilibiliComments = async (forceBVid) => {
     danmakuTxtContent,
     zimuTextContent
   );
-
-  console.log(`评论已保存到目录: ${outputDir}`);
+  notifier.info(`${notifierTitle} 合并数据完成`);
 
   if (process.env.EXECUTABLE_PATH) {
     const browser = (await import("#utils/browser")).default;
@@ -319,7 +321,7 @@ const crawlBilibiliComments = async (forceBVid) => {
 
   if (process.env.IS_FETCH_VIDEO_STREAM === "1") {
     const videoInfoUrl = getBilibiliVideoStreamUrl(bvid, detail.cid);
-    console.log(`已获取到视频流URL：${videoInfoUrl}`);
+    notifier.info(`${notifierTitle} 已获取到视频流URL`);
 
     /** @type {{data:BilibiliVideoInfo}} */
     const { data: videoInfoResponse } = await axios.get(videoInfoUrl, {
@@ -330,6 +332,7 @@ const crawlBilibiliComments = async (forceBVid) => {
     const videoUrl = videoInfoResponse.data.durl?.[0]?.url;
 
     await processVideoAndAudio(outputDir, videoUrl, getHeaders());
+    notifier.info(`${notifierTitle} 流处理完成`);
   }
 
   if (isElectron()) {
@@ -344,7 +347,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   // 检查队列中是否有待执行的任务
   for (const [nextBVid, status] of queue.entries()) {
     if (status === "ready") {
-      console.log(`\n开始执行队列中的下一个任务: ${nextBVid}`);
+      notifier.log(`\n开始执行队列中的下一个任务: ${nextBVid}`);
       await crawlBilibiliComments(nextBVid);
       break;
     }
@@ -360,13 +363,13 @@ async function main() {
     } catch (error) {
       console.error("爬虫执行失败:", error);
     }
-    console.log("\n==================================================");
-    console.log("爬虫任务已完成，现在进入交互模式");
-    console.log("==================================================\n");
+    notifier.log("\n==================================================");
+    notifier.log("爬虫任务已完成，现在进入交互模式");
+    notifier.log("==================================================\n");
   } else {
-    console.log("\n==================================================");
-    console.log("欢迎使用 Bilibili 信息爬虫");
-    console.log("==================================================\n");
+    notifier.log("\n==================================================");
+    notifier.log("欢迎使用 Bilibili 信息爬虫");
+    notifier.log("==================================================\n");
   }
 
   // 启动Hapi服务器

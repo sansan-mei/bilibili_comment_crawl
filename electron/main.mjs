@@ -1,5 +1,6 @@
 import { crawlScript } from "#crawl";
 import { createNotice, killPortProcess } from "#utils/electron";
+import { notifier } from "#utils/notifier";
 import { config } from "dotenv";
 import { app } from "electron";
 import { dirname, join } from "node:path";
@@ -10,7 +11,7 @@ app.whenReady().then(async () => {
   config({ path: envPath });
 
   if (process.env.STATIC_PATH) {
-    console.log(`\n已加载 STATIC_PATH: ${process.env.STATIC_PATH}\n`);
+    notifier.log(`\n已加载 STATIC_PATH: ${process.env.STATIC_PATH}\n`);
   }
 
   // 先释放端口
