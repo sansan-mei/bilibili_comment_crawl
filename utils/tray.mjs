@@ -1,6 +1,6 @@
 // 系统托盘管理模块
 import AutoLaunch from "auto-launch";
-import { Menu, nativeImage, screen, Tray } from "electron";
+import { app, Menu, nativeImage, screen, Tray } from "electron";
 import { readFile } from "fs/promises";
 import os from "os";
 import path from "path";
@@ -236,7 +236,7 @@ async function createTrayMenu() {
       click: () => {
         console.log("程序已退出");
         destroyTray();
-        process.exit(0);
+        app.quit();
       },
     },
   ]);
