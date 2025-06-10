@@ -11,3 +11,4 @@ bilibili_all**
 /model/*
 !/model/tag.txt
 *subtitles.txt
+.DS_Store
