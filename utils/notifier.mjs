@@ -38,6 +38,16 @@ class Notifier {
   log(message) {
     console.log(message);
   }
+
+  /**
+   * 清除托盘菜单
+   */
+  async clear() {
+    if (this._isElectron) {
+      const { createTrayMenu } = await import("#utils/tray");
+      createTrayMenu();
+    }
+  }
 }
 
 export const notifier = new Notifier();

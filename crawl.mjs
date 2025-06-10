@@ -2,7 +2,6 @@
 
 import {
   convertToSRT,
-  createNotice,
   delay,
   ensureDirectoryExists,
   existFile,
@@ -20,7 +19,6 @@ import {
   getSubtitleListUrl,
   getSubtitlesPath,
   getSubtitleUrl,
-  isElectron,
   logStart,
   notifier,
   processVideoAndAudio,
@@ -113,7 +111,7 @@ const crawlBilibiliComments = async (forceBVid) => {
   /** @type {string} */
   let zimuTextContent = "";
 
-  const notifierTitle = `【${detail.title.slice(0, 7)}】`;
+  const notifierTitle = `(${detail.title.slice(0, 5)}...)`;
 
   notifier.info(`${notifierTitle} 正在获取弹幕`);
   if (!existFile(danmakuFilePath)) {
@@ -335,14 +333,10 @@ const crawlBilibiliComments = async (forceBVid) => {
     notifier.info(`${notifierTitle} 流处理完成`);
   }
 
-  if (isElectron()) {
-    createNotice({
-      title: "哔哩哔哩脚本",
-      body: `${detail.title}-收集成功`,
-    });
-  }
+  notifier.notify("哔哩哔哩脚本", `${detail.title}-收集成功`);
 
   queue.delete(bvid);
+  notifier.clear();
 
   // 检查队列中是否有待执行的任务
   for (const [nextBVid, status] of queue.entries()) {
