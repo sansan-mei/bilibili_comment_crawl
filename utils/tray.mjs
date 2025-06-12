@@ -2,7 +2,6 @@
 import AutoLaunch from "auto-launch";
 import { app, Menu, nativeImage, screen, Tray } from "electron";
 import { readFile } from "fs/promises";
-import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { listCrawledVideos, openCrawledVideo, showHelp } from "./cli.mjs";
@@ -23,12 +22,7 @@ function initAutoLauncher() {
   if (autoLauncher) return autoLauncher;
 
   // 根据平台确定应用路径
-  let appPath;
-  if (os.platform() === "win32") {
-    appPath = path.resolve(process.cwd(), "Bilibili脚本.exe");
-  } else if (os.platform() === "darwin") {
-    appPath = process.execPath;
-  }
+  const appPath = process.execPath;
 
   if (appPath) {
     autoLauncher = new AutoLaunch({
