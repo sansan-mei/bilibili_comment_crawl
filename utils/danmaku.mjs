@@ -36,6 +36,7 @@ export const parseMode = (mode) => {
  * @returns {AnyArray} 解析后的弹幕数组
  */
 export const decodeDanMu = (buffer) => {
+  const danmakuHashMap = new DanMaKuHashMap();
   try {
     const decoded = DmSegMobileReply.decode(new Uint8Array(buffer));
     // @ts-ignore - 忽略elems属性不存在的错误
@@ -45,7 +46,7 @@ export const decodeDanMu = (buffer) => {
         time: dm.progress / 1000, // 转换为秒
         content: dm.content,
         type: parseMode(dm.mode),
-        sender: dm.midHash,
+        sender: danmakuHashMap.add(dm.midHash),
         sendTime: parseTime(dm.ctime),
         pool: ["普通池", "字幕池", "特殊池"][dm.pool] || "未知",
         attributes: {
@@ -145,3 +146,36 @@ export const fetchDanmaku = async (cid, totalDanmaku) => {
     return danmus; // 返回已获取的弹幕
   }
 };
+
+class DanMaKuHashMap {
+  constructor() {
+    this.map = new Map();
+    this.counter = 1;
+  }
+  /**
+   *
+   * @param {string} key
+   */
+  add(key) {
+    const renderName = this.get(key);
+    if (renderName) {
+      return renderName;
+    }
+    const newRenderName = `user_${this.counter++}`;
+    this.map.set(key, newRenderName);
+    return newRenderName;
+  }
+
+  /**
+   *
+   * @param {string} key
+   * @returns {string}
+   */
+  get(key) {
+    return this.map.get(key);
+  }
+
+  clear() {
+    this.map.clear();
+  }
+}

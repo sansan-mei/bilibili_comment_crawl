@@ -2,6 +2,16 @@
 import { formatTime } from "./utils.mjs";
 
 /**
+ * 清理异常的Unicode行结束符
+ * @param {string} text - 要清理的文本
+ * @returns {string} 清理后的文本
+ */
+const cleanUnusualLineTerminators = (text) => {
+  // 移除 Line Separator (U+2028) 和 Paragraph Separator (U+2029)
+  return text.replace(/[\u2028\u2029]/g, " ");
+};
+
+/**
  * 格式化评论为TXT内容
  * @param {IComment[]} comments - 评论数组
  * @returns {string} 格式化后的TXT内容
@@ -11,9 +21,10 @@ export const formatCommentsToTxt = (comments) => {
     .map((c) => {
       const location = c?.reply_control?.location || "未知";
       const time = c?.reply_control?.time_desc || "未知";
+      const content = cleanUnusualLineTerminators(c.content);
 
       // 主评论
-      let commentText = `${c.author}：${c.sex}：时间-${c.time}：内容-${c.content}：点赞-${c.like}：回复-${c.replyCount}：地区-${location}：回复时间-${time}`;
+      let commentText = `${c.author}：${c.sex}：时间-${c.time}：内容-${content}：点赞-${c.like}：回：地区复-${c.replyCount}-${location}：回复时间-${time}`;
 
       // 添加子评论（如果有）
       if (c.childList && c.childList.length > 0) {
@@ -22,7 +33,9 @@ export const formatCommentsToTxt = (comments) => {
           .map((child) => {
             const _location = child?.reply_control?.location || "未知";
             const _time = child?.reply_control?.time_desc || "未知";
-            return `  └─ ${child.author}：${child.sex}：时间-${child.time}：内容-${child.content}：点赞-${child.like}：地区-${_location}：回复时间-${_time}`;
+            const _content = cleanUnusualLineTerminators(child.content);
+
+            return `  └─ ${child.author}：${child.sex}：时间-${child.time}：内容-${_content}：点赞-${child.like}：地区-${_location}：回复时间-${_time}`;
           })
           .join("\n");
         commentText += "\n" + childComments;

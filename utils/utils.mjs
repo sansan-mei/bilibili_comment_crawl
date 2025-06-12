@@ -91,6 +91,7 @@ export const processVideoDetail = (detail, data) => {
   detail.like = data.stat.like;
   detail.cid = data.cid;
   detail.danmaku = data.stat.danmaku;
+  detail.owner = data.owner.name;
 };
 
 /**
@@ -200,3 +201,31 @@ export const getStaticPath = async () => {
     );
   }
 };
+
+/**
+ *
+ * @param {AnyObject} obj
+ * @param {string[]} excludeKeys
+ * @returns {AnyObject}
+ */
+export function filterObject(obj, excludeKeys) {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key]) => !excludeKeys.includes(key))
+  );
+}
+
+/**
+ * 格式化时间戳为年月日时分秒
+ * @param {number} timestamp - 时间戳(秒)
+ * @returns {string} 格式化后的时间字符串
+ */
+export function formatTimestamp(timestamp) {
+  const date = new Date(timestamp * 1000);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}

@@ -20,7 +20,7 @@ declare type IComment = {
   content: string;
   author: string;
   sex: string;
-  time: number;
+  time: number | string;
   rpid: string;
   childList: Array<IComment>;
   replyCount: number;
