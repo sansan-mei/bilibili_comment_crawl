@@ -27,13 +27,16 @@ function initAutoLauncher() {
   if (os.platform() === "win32") {
     appPath = path.resolve(process.cwd(), "Bilibili脚本.exe");
   } else if (os.platform() === "darwin") {
-    appPath = path.resolve(process.cwd(), "Bilibili脚本.app");
+    appPath = process.execPath;
   }
 
   if (appPath) {
     autoLauncher = new AutoLaunch({
       name: "Bilibili脚本",
       path: appPath,
+      mac: {
+        useLaunchAgent: true,
+      },
     });
   }
 
