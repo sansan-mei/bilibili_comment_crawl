@@ -35,10 +35,16 @@ process.on("unhandledRejection", (reason) => {
   console.error("未处理的 Promise 错误:", reason);
   createNotice({
     title: "系统错误",
-    body: `Promise 错误: ${
+    body: `Promise 错误，应用将重启: ${
       reason instanceof Error ? reason.message : String(reason)
     }`,
   });
+
+  // 延迟重启，让通知有时间显示
+  setTimeout(() => {
+    app.relaunch();
+    app.quit();
+  }, 2000);
 });
 
 // 监听未捕获的异常
@@ -46,6 +52,12 @@ process.on("uncaughtException", (error) => {
   console.error("未捕获的异常:", error);
   createNotice({
     title: "系统异常",
-    body: `异常: ${error.message}`,
+    body: `异常，应用将重启: ${error.message}`,
   });
+
+  // 延迟重启，让通知有时间显示
+  setTimeout(() => {
+    app.relaunch();
+    app.quit();
+  }, 2000);
 });
