@@ -7,7 +7,7 @@ import {
   getDanmakuPath,
   getDetailPath,
   mergeTxt,
-} from "./index.mjs";
+} from "../index.mjs";
 
 /**
  * 确保目录存在

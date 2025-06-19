@@ -1,5 +1,5 @@
 // 格式化数据相关函数
-import { formatTime } from "./utils.mjs";
+import { formatTime } from "../utils.mjs";
 
 /**
  * 清理异常的Unicode行结束符

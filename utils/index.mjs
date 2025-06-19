@@ -1,16 +1,16 @@
 // 统一导出点，引用和导出所有模块
 
 // 导出API相关函数
-export * from "./api.mjs";
+export * from "./bilibili/api.mjs";
 
 // 导出格式化相关函数
-export * from "./format.mjs";
+export * from "./bilibili/format.mjs";
 
 // 导出弹幕相关函数
-export * from "./danmaku.mjs";
+export * from "./bilibili/danmaku.mjs";
 
 // 导出文件系统相关函数
-export * from "./file.mjs";
+export * from "./bilibili/file.mjs";
 
 // 导出交互式命令行相关函数
 export * from "./cli.mjs";
@@ -31,10 +31,10 @@ export * from "./speechToText.mjs";
 export * from "./electron.mjs";
 
 // 导出路径相关函数
-export * from "./path.mjs";
+export * from "./bilibili/path.mjs";
 
 // 导出字幕相关函数
-export * from "./subtitle.mjs";
+export * from "./bilibili/subtitle.mjs";
 
 // 导出通知相关函数
 export * from "./notifier.mjs";

@@ -12,7 +12,7 @@ import {
   getOid,
   getReplyUrl,
   notifier,
-} from "./index.mjs";
+} from "../index.mjs";
 
 /**
  * 获取B站评论

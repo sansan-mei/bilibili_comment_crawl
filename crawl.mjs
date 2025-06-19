@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { fetchBilibiliComments } from "#utils/comments";
+import { fetchBilibiliComments } from "#utils/bilibili/comments";
 import {
   convertToSRT,
   ensureDirectoryExists,

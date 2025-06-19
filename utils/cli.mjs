@@ -21,7 +21,7 @@ export async function startInteractiveMode() {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      notifier.log("托盘创建失败，使用普通命令行模式:", errorMessage);
+      notifier.log(`托盘创建失败，使用普通命令行模式: ${errorMessage}`);
       promptForAction();
     }
   } else {

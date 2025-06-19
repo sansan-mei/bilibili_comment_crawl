@@ -1,8 +1,12 @@
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 import ffmpeg from "fluent-ffmpeg";
-import { existFile } from "./file.mjs";
+import { existFile } from "./bilibili/file.mjs";
+import {
+  getAudioPath,
+  getSubtitlesPath,
+  getVideoPath,
+} from "./bilibili/path.mjs";
 import { notifier } from "./notifier.mjs";
-import { getAudioPath, getSubtitlesPath, getVideoPath } from "./path.mjs";
 import { generateSubtitles } from "./speechToText.mjs";
 import { downloadVideo } from "./utils.mjs";
 
