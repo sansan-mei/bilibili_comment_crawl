@@ -50,7 +50,6 @@ export const fetchBilibiliComments = async (
       });
     }
     try {
-      notifier.info(`${notifierTitle} 正在获取${i + 1}页评论`);
       const response = await axios.get(getMainCommentUrl(i, getOid()), {
         headers: getHeaders(),
       });
@@ -124,16 +123,17 @@ export const fetchBilibiliComments = async (
         0
       );
 
-      notifier.log(
-        `搜集到${comments.length}条主评论，${totalChildComments}条子评论，总计${
-          comments.length + totalChildComments
-        }条评论`
-      );
-
       // 检查是否已达到目标评论数量（90%）
       const currentTotalComments =
         comments.length +
         comments.reduce((acc, cur) => acc + cur.replyCount, 0);
+
+      notifier.info(
+        `${notifierTitle} 已获取${(
+          (currentTotalComments / targetCommentCount) *
+          100
+        ).toFixed(1)}%评论`
+      );
 
       if (currentTotalComments >= targetCommentCount) {
         notifier.log(
