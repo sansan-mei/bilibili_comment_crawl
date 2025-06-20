@@ -49,8 +49,8 @@ export const fetchBilibiliComments = async (
         encoding: "utf-8",
       });
     }
-    notifier.info(`${notifierTitle} 正在获取评论`);
     try {
+      notifier.info(`${notifierTitle} 正在获取${i + 1}页评论`);
       const response = await axios.get(getMainCommentUrl(i, getOid()), {
         headers: getHeaders(),
       });
