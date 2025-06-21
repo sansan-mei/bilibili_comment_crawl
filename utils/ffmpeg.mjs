@@ -24,7 +24,7 @@ export const extractAudio = (videoPath, audioPath) => {
     ffmpeg(videoPath)
       .outputOptions("-vn")
       .audioCodec("libmp3lame")
-      .audioFrequency(16000)
+      .audioFrequency(44100)
       .audioChannels(1)
       .format("mp3")
       .output(audioPath)
