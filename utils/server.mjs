@@ -33,8 +33,13 @@ app.route({
         .map((item) => `${item.name}=${item.value}`)
         .join("; ");
     }
-    handle?.(b_vid);
-    return handle ? "请求成功，正在处理..." : "未提供处理函数";
+    if (handle && cookies) {
+      handle(b_vid);
+      notifier.notify("Bilibili脚本", "正在请求处理...");
+      return "请求成功，正在处理...";
+    } else {
+      return "未提供处理函数";
+    }
   },
 });
 
