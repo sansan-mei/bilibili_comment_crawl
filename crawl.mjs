@@ -179,11 +179,6 @@ const crawlBilibiliComments = async (forceBVid) => {
   );
   notifier.info(`${notifierTitle} 合并数据完成`);
 
-  if (process.env.EXECUTABLE_PATH) {
-    const browser = (await import("#utils/browser")).default;
-    await browser.run(allPath);
-  }
-
   if (process.env.IS_FETCH_VIDEO_STREAM === "1") {
     const videoInfoUrl = getBilibiliVideoStreamUrl(bvid, detail.cid);
     notifier.info(`${notifierTitle} 已获取到视频流URL`);
