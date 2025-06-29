@@ -1,11 +1,6 @@
 import { processVideoAndAudio } from "#utils/ffmpeg";
 import { notifier } from "#utils/notifier";
-import {
-  getHeaders,
-  getStaticPath,
-  processVideoDetail,
-  sanitizeFilename,
-} from "#utils/utils";
+import { getStaticPath, sanitizeFilename } from "#utils/utils";
 import axios from "axios";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
@@ -21,6 +16,7 @@ import { ensureDirectoryExists, existFile, saveCommentData } from "./file.mjs";
 import { formatDanmakuToTxt } from "./format.mjs";
 import { getDanmakuPath, getSubtitlesPath } from "./path.mjs";
 import { convertToSRT } from "./subtitle.mjs";
+import { getBVid, getHeaders, processVideoDetail } from "./utils.mjs";
 
 /** @type {Map<string,'running' | 'ready'>} */
 const queue = new Map();
@@ -204,23 +200,4 @@ export const crawlBilibiliComments = async (forceBVid) => {
   }
 };
 
-/**
- * 获取BV号
- * @param {string} [arg] - 命令行参数
- * @returns {string} - BV号
- */
-export const getBVid = (arg) => {
-  /** @https://www.bilibili.com/list/watchlater?bvid=BV1T3QNYaEBL&oid=114155331782990 */
-  const argv2 = arg || process.argv[2];
-  if (argv2?.includes("BV")) {
-    const result = argv2.match(/BV[a-zA-Z0-9]{10}/)?.[0];
-    if (result) {
-      return result;
-    } else {
-      throw new Error("BV号格式错误");
-    }
-  }
-
-  // 最后尝试从环境变量B_VID获取
-  return process.env.B_VID;
-};
+export * from "./utils.mjs";

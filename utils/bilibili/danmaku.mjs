@@ -1,7 +1,8 @@
 // 弹幕相关功能
 import { DmSegMobileReply } from "#export/index";
 import { notifier } from "#utils/notifier";
-import { delay, getHeaders } from "#utils/utils";
+import { delay } from "#utils/utils";
+import { getHeaders } from "./utils.mjs";
 
 /**
  * 将protobuf时间戳转换为ISO时间

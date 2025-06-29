@@ -5,7 +5,6 @@ import fs from "fs";
 import { createWriteStream } from "node:fs";
 import path, { normalize } from "node:path";
 import { fileURLToPath } from "node:url";
-import UserAgent from "user-agents";
 import { notifier } from "./notifier.mjs";
 
 /**
@@ -29,14 +28,6 @@ export const sanitizeFilename = (filename) => {
 };
 
 /**
- * 获取环境变量中的OID
- * @returns {string} - 视频OID
- */
-export const getOid = () => {
-  return process.env.OID;
-};
-
-/**
  * 将秒数格式化为时:分:秒格式
  * @param {number} seconds - 秒数
  * @returns {string} - 格式化后的时间字符串
@@ -49,40 +40,6 @@ export const formatTime = (seconds) => {
   return `${hours.toString().padStart(2, "0")}:${minutes
     .toString()
     .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-};
-
-/**
- * 处理视频详情数据
- * @param {BilibiliDetail} detail - 视频详情对象
- * @param {any} data - API返回的数据
- * @returns {void}
- */
-export const processVideoDetail = (detail, data) => {
-  detail.title = data.title;
-  detail.description = data.desc;
-  detail.oid = data.aid;
-  detail.view = data.stat.view;
-  detail.danmaku = data.stat.danmaku;
-  detail.reply = data.stat.reply;
-  detail.favorite = data.stat.favorite;
-  detail.coin = data.stat.coin;
-  detail.share = data.stat.share;
-  detail.like = data.stat.like;
-  detail.cid = data.cid;
-  detail.danmaku = data.stat.danmaku;
-  detail.owner = data.owner.name;
-};
-
-/**
- * 处理视频流数据，提取视频URL
- * @param {any} data - API返回的数据
- * @returns {string|null} 视频URL，如果没有则返回null
- */
-export const extractVideoUrl = (data) => {
-  if (data && data.data && data.data.durl && data.data.durl.length > 0) {
-    return data.data.durl[0].url;
-  }
-  return null;
 };
 
 /**
@@ -129,19 +86,6 @@ export const downloadVideo = async (url, videoPath, headers) => {
     );
     throw error;
   }
-};
-
-/**
- * 获取请求头
- * @returns {AnyObject} 请求头
- */
-export const getHeaders = () => {
-  return {
-    "user-agent": new UserAgent().toString(),
-    cookie: process.env.COOKIES,
-    referer: "https://www.bilibili.com/",
-    origin: "https://www.bilibili.com/",
-  };
 };
 
 // 判断是不是electron环境
