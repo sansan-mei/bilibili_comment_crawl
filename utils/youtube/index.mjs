@@ -13,8 +13,8 @@ import {
   getCommentThreadsUrl,
   getVideoInfoUrl,
 } from "./api.mjs";
+import { getApiKey, getYoutubeVideoId } from "./helper.mjs";
 
-const apiKey = process.env.YOUTUBE_API_KEY;
 const staticPath = await getStaticPath();
 
 /**
@@ -27,7 +27,7 @@ const fetchCaptionsList = async (videoId) => {
     const params = new URLSearchParams({
       part: "snippet",
       videoId: videoId,
-      key: apiKey,
+      key: getApiKey(),
     });
 
     const response = await fetch(`${getCaptionsUrl()}?${params.toString()}`);
@@ -135,7 +135,7 @@ const fetchVideoInfo = async (videoId) => {
     const params = new URLSearchParams({
       part: "snippet,contentDetails,statistics",
       id: videoId,
-      key: apiKey,
+      key: getApiKey(),
     });
 
     const response = await fetch(`${getVideoInfoUrl()}?${params.toString()}`);
@@ -200,7 +200,7 @@ const fetchCommentsUntilCount = async (
       const params = new URLSearchParams({
         part: "snippet,replies",
         videoId: videoId,
-        key: `${apiKey}`,
+        key: `${getApiKey()}`,
         maxResults: "500",
         order: order,
       });
@@ -263,15 +263,16 @@ const fetchCommentsUntilCount = async (
 
 /**
  * 获取完整的视频数据（包括基础信息、评论、字幕列表和字幕内容）
- * @param {string} videoId YouTube视频ID
+ * @param {string} url YouTube视频URL
  * @param {number} targetCount 评论目标数量
  * @param {"relevance" | "time"} order 评论排序方式
  */
 const fetchVideoData = async (
-  videoId,
+  url,
   targetCount = 12000,
   order = "relevance"
 ) => {
+  const videoId = getYoutubeVideoId(url);
   try {
     console.log("开始获取视频数据...");
 
