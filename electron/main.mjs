@@ -1,6 +1,7 @@
 import { crawlScript } from "#crawl";
 import { createNotice, killPortProcess } from "#utils/electron";
 import { notifier } from "#utils/notifier";
+import { isManualExitTriggered } from "#utils/tray";
 import { config } from "dotenv";
 import { app } from "electron";
 import { dirname, join } from "node:path";
@@ -32,6 +33,9 @@ app.on("window-all-closed", (/** @type {any} */ event) => {
 
 // 监听未捕获的 Promise 错误
 process.on("unhandledRejection", (reason) => {
+  if (isManualExitTriggered()) {
+    return;
+  }
   console.error("未处理的 Promise 错误:", reason);
   createNotice({
     title: "系统错误",
@@ -49,6 +53,9 @@ process.on("unhandledRejection", (reason) => {
 
 // 监听未捕获的异常
 process.on("uncaughtException", (error) => {
+  if (isManualExitTriggered()) {
+    return;
+  }
   console.error("未捕获的异常:", error);
   createNotice({
     title: "系统异常",

@@ -1,13 +1,13 @@
 // 文件系统操作相关函数
+import { filterObject } from "#utils/index";
 import fs, { existsSync, mkdirSync } from "fs";
+import { mergeTxt } from "./format.mjs";
 import {
-  filterObject,
   getAllPath,
   getCommentPath,
   getDanmakuPath,
   getDetailPath,
-  mergeTxt,
-} from "../index.mjs";
+} from "./path.mjs";
 
 /**
  * 确保目录存在

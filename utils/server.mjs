@@ -21,9 +21,9 @@ await app.register(Inert);
 
 app.route({
   method: "POST",
-  path: "/start-crawl/{b_vid}",
+  path: "/start-crawl/{platform}/{video_id}",
   handler: (request) => {
-    const { b_vid } = request.params;
+    const { platform, video_id } = request.params;
     /** @type {any} */
     const pl = request.payload;
     /** @type {Array<{name:string,value:string}>} */
@@ -33,13 +33,21 @@ app.route({
         .map((item) => `${item.name}=${item.value}`)
         .join("; ");
     }
-    if (handle && cookies) {
-      handle(b_vid);
-      notifier.notify("Bilibili脚本", "正在请求处理...");
-      return "请求成功，正在处理...";
-    } else {
-      return "未提供处理函数";
+
+    // 验证平台参数
+    const supportedPlatforms = ["bilibili", "youtube"];
+    if (!supportedPlatforms.includes(platform)) {
+      return { success: false, error: `不支持的平台: ${platform}` };
     }
+
+    handle(platform, video_id);
+    notifier.notify(`${platform}脚本`, "正在请求处理...");
+    return {
+      success: true,
+      message: `${platform} 爬虫任务已启动`,
+      video_id,
+      platform,
+    };
   },
 });
 

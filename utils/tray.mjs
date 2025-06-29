@@ -15,6 +15,16 @@ let tray = null;
 /** @type {AutoLaunch | null} */
 let autoLauncher = null;
 
+/** 标记是否为主动退出 */
+let isManualExit = false;
+
+/**
+ * 检查是否为主动退出
+ */
+export function isManualExitTriggered() {
+  return isManualExit;
+}
+
 /**
  * 初始化自启动管理器
  */
@@ -207,6 +217,7 @@ export async function createTrayMenu(menu) {
       label: "退出程序",
       click: () => {
         notifier.log("程序已退出");
+        isManualExit = true; // 设置主动退出标记
         destroyTray();
         app.quit();
       },
