@@ -1,13 +1,12 @@
-import { notifier } from "#utils/notifier";
-import { delay, formatTimestamp } from "#utils/utils";
+import { delay, formatTimestamp, notifier } from "#utils/index";
 import axios from "axios";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { getMainCommentUrl, getReplyUrl } from "./api.mjs";
 import { existFile } from "./file.mjs";
 import { formatCommentsToTxt } from "./format.mjs";
+import { getHeaders, getOid } from "./helper.mjs";
 import { getCommentPath } from "./path.mjs";
-import { getHeaders, getOid } from "./utils.mjs";
 
 /**
  * 获取B站评论

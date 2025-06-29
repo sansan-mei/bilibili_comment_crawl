@@ -1,6 +1,9 @@
-import { processVideoAndAudio } from "#utils/ffmpeg";
-import { notifier } from "#utils/notifier";
-import { getStaticPath, sanitizeFilename } from "#utils/utils";
+import {
+  getStaticPath,
+  notifier,
+  processVideoAndAudio,
+  sanitizeFilename,
+} from "#utils/index";
 import axios from "axios";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
@@ -14,9 +17,9 @@ import { fetchBilibiliComments } from "./comments.mjs";
 import { fetchDanmaku } from "./danmaku.mjs";
 import { ensureDirectoryExists, existFile, saveCommentData } from "./file.mjs";
 import { formatDanmakuToTxt } from "./format.mjs";
+import { getBVid, getHeaders, processVideoDetail } from "./helper.mjs";
 import { getDanmakuPath, getSubtitlesPath } from "./path.mjs";
 import { convertToSRT } from "./subtitle.mjs";
-import { getBVid, getHeaders, processVideoDetail } from "./utils.mjs";
 
 /** @type {Map<string,'running' | 'ready'>} */
 const queue = new Map();
@@ -200,4 +203,4 @@ export const crawlBilibiliComments = async (forceBVid) => {
   }
 };
 
-export * from "./utils.mjs";
+export * from "./helper.mjs";

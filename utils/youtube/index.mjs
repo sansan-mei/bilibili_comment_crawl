@@ -1,4 +1,4 @@
-import { getStaticPath } from "#utils/utils";
+import { getStaticPath } from "#utils/index";
 import {
   existsSync,
   mkdirSync,
