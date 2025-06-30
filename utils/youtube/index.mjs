@@ -15,8 +15,6 @@ import {
 } from "./api.mjs";
 import { getApiKey, getYoutubeVideoId } from "./helper.mjs";
 
-const staticPath = await getStaticPath();
-
 /**
  * 获取视频字幕列表（仅列表，不下载内容）
  * @param {string} videoId YouTube视频ID
@@ -278,6 +276,8 @@ const fetchVideoData = async (
 
     // 获取视频基础信息
     const videoInfo = await fetchVideoInfo(videoId);
+
+    const staticPath = await getStaticPath();
 
     const currentPath = `${staticPath}/${videoInfo.title}`;
 
