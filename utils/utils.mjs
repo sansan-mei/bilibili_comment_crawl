@@ -17,6 +17,32 @@ export const delay = (ms = 500) =>
     setTimeout(resolve, ms + Math.floor(Math.random() * 500))
   );
 
+export class Delay {
+  /**
+   * @param {keyof typeof Delay.prototype.platform_map} platform
+   */
+  constructor(platform) {
+    this.platform = platform;
+    this.config = this.platform_map[platform] || this.platform_map.default;
+  }
+
+  platform_map = {
+    bilibili: { base: 100, random: 300 },
+    douyin: { base: 150, random: 400 },
+    xhs: { base: 200, random: 500 },
+    youtube: { base: 80, random: 200 },
+    zhihu: { base: 120, random: 350 },
+    default: { base: 100, random: 400 },
+  };
+
+  delay() {
+    const { base, random } = this.config;
+    return new Promise((resolve) =>
+      setTimeout(resolve, base + Math.floor(Math.random() * random))
+    );
+  }
+}
+
 /**
  * 清理文件名，移除不允许的特殊字符
  * @param {string} filename - 原始文件名
