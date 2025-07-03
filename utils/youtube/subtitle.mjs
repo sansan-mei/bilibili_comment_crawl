@@ -6,6 +6,7 @@ import {
   renameSync,
   unlinkSync,
 } from "fs";
+import UserAgent from "user-agents";
 import { getYTDlpModule } from "./helper.mjs";
 
 /**
@@ -26,12 +27,12 @@ export const downloadCaptionsWithYtDlp = async (videoId, outputPath) => {
       "--write-subs", // 下载手动字幕
       "--write-auto-subs", // 下载自动生成字幕
       "--sub-langs",
-      "zh,zh-CN,zh-TW,en", // 多语言
+      "zh,zh-CN,zh-TW,zh-Hans,zh-Hant,en,en-US,en-GB", // 包含常见的中英文语言代码
       "--sub-format",
       "srt", // SRT格式
       "--skip-download", // 不下载视频
       "--user-agent",
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      new UserAgent().toString(),
       "--sleep-interval",
       "1", // 请求间隔
       "--max-sleep-interval",
@@ -56,10 +57,20 @@ export const downloadCaptionsWithYtDlp = async (videoId, outputPath) => {
         // 优先选择中文字幕，其次英文字幕
         const preferredFile =
           subtitleFiles.find(
-            (file) => file.includes("zh") || file.includes("cn")
+            (file) =>
+              file.includes("zh") ||
+              file.includes("cn") ||
+              file.includes("Chinese") ||
+              file.includes("Hans") ||
+              file.includes("Hant")
           ) ||
-          subtitleFiles.find((file) => file.includes("en")) ||
+          subtitleFiles.find(
+            (file) => file.includes("en") || file.includes("English")
+          ) ||
           subtitleFiles[0];
+
+        notifier.info(`找到的字幕文件: ${subtitleFiles.join(", ")}`);
+        notifier.info(`选择的字幕文件: ${preferredFile}`);
 
         const sourcePath = `${outputPath}/${preferredFile}`;
         const targetPath = `${outputPath}/subtitles.txt`;
