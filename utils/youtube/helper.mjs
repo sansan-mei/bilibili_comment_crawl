@@ -38,6 +38,22 @@ export const getYTDlpModule = () => {
 };
 
 /**
+ * 清理文件名中的非法字符
+ * @param {string} filename - 原始路径
+ * @returns {string} - 清理后的路径
+ */
+export const sanitizeFilename = (filename) => {
+  // Windows 非法字符: < > : " / \ | ? *
+  // 以及控制字符和保留名称
+  return filename
+    .replace(/[<>:"/\\|?*]/g, "_")
+    .replace(/[\x00-\x1F\x7F]/g, "_")
+    .replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i, "_$1")
+    .replace(/\.$/, "_")
+    .trim();
+};
+
+/**
  * 合并 YouTube 数据
  * @param {YouTubeVideoInfo} videoInfo - 视频信息
  * @param {YouTubeComment[]} comments - 评论

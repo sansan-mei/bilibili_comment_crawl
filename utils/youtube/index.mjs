@@ -1,63 +1,9 @@
-import { getStaticPath, notifier } from "#utils/index";
+import { getStaticPath, notifier, sanitizeFilename } from "#utils/index";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { getVideoInfoUrl } from "./api.mjs";
+import { fetchVideoInfo } from "./baseInfo.mjs";
 import { fetchCommentsUntilCount } from "./comments.mjs";
-import { getApiKey, getYoutubeVideoId, mergeYoutubeData } from "./helper.mjs";
+import { getYoutubeVideoId, mergeYoutubeData } from "./helper.mjs";
 import { downloadCaptionsWithYtDlp } from "./subtitle.mjs";
-
-/**
- * 获取视频基础信息
- * @param {string} videoId YouTube视频ID
- * @returns {Promise<YouTubeVideoInfo>} 视频基础信息对象
- */
-const fetchVideoInfo = async (videoId) => {
-  try {
-    const params = new URLSearchParams({
-      part: "snippet,contentDetails,statistics",
-      id: videoId,
-      key: getApiKey(),
-    });
-
-    const response = await fetch(`${getVideoInfoUrl()}?${params.toString()}`);
-
-    if (!response.ok) {
-      throw new Error(`API错误: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-
-    if (!data.items || data.items.length === 0) {
-      throw new Error("未找到视频信息");
-    }
-
-    const video = data.items[0];
-    const videoInfo = {
-      id: video.id,
-      title: video.snippet.title,
-      description: video.snippet.description,
-      channelId: video.snippet.channelId,
-      channelTitle: video.snippet.channelTitle,
-      publishedAt: video.snippet.publishedAt,
-      duration: video.contentDetails.duration,
-      viewCount: video.statistics.viewCount,
-      likeCount: video.statistics.likeCount,
-      commentCount: video.statistics.commentCount,
-      categoryId: video.snippet.categoryId,
-      tags: video.snippet.tags || [],
-      thumbnails: video.snippet.thumbnails,
-    };
-
-    notifier.info(`已获取视频信息: ${videoInfo.title}`);
-    notifier.info(
-      `观看次数: ${videoInfo.viewCount}, 点赞数: ${videoInfo.likeCount}`
-    );
-
-    return videoInfo;
-  } catch (error) {
-    console.error("获取视频信息失败:", error);
-    throw error;
-  }
-};
 
 /**
  * 获取完整的视频数据（包括基础信息、评论、字幕列表和字幕内容）
@@ -79,7 +25,8 @@ const fetchVideoData = async (
 
     const staticPath = await getStaticPath();
 
-    const currentPath = `${staticPath}/${videoInfo.title}`;
+    // 清理文件名中的非法字符
+    const currentPath = `${staticPath}/${sanitizeFilename(videoInfo.title)}`;
 
     /** @type {YouTubeComment[]} */
     let comments = [];
@@ -124,6 +71,7 @@ const fetchVideoData = async (
 
     notifier.info(captionContents ? `字幕内容已获取` : `字幕内容获取失败`);
     notifier.clear();
+    notifier.notify("youtube脚本", `${videoInfo.title}-视频数据获取完成`);
   } catch (error) {
     console.error("获取视频数据失败:", error);
   }
