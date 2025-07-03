@@ -1,4 +1,4 @@
-import { delay, formatTimestamp, notifier } from "#utils/index";
+import { _delay, formatTimestamp, notifier } from "#utils/index";
 import axios from "axios";
 import { readFileSync } from "fs";
 import { join } from "path";
@@ -7,6 +7,8 @@ import { existFile } from "./file.mjs";
 import { formatCommentsToTxt } from "./format.mjs";
 import { getHeaders, getOid } from "./helper.mjs";
 import { getCommentPath } from "./path.mjs";
+
+const delay = _delay("bilibili");
 
 /**
  * 获取B站评论
@@ -156,7 +158,7 @@ export const fetchBilibiliComments = async (
         break;
       }
 
-      await delay(1000);
+      await delay();
     }
   }
 

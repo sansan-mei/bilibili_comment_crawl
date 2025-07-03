@@ -1,7 +1,9 @@
 // 弹幕相关功能
 import { DmSegMobileReply } from "#export/index";
-import { delay, notifier } from "#utils/index";
+import { _delay, notifier } from "#utils/index";
 import { getHeaders } from "./helper.mjs";
+
+const delay = _delay("bilibili");
 
 /**
  * 将protobuf时间戳转换为ISO时间
@@ -117,7 +119,7 @@ export const fetchDanmaku = async (cid, totalDanmaku) => {
       // 使用已有的fetchBilDanMu函数获取弹幕
       const pageDanmus = await fetchBilDanMu(cid.toString(), page.toString());
 
-      await delay(1000);
+      await delay();
 
       if (!pageDanmus || pageDanmus.length === 0) {
         notifier.log(`第${page}页没有弹幕，可能已到达末尾`);

@@ -243,3 +243,5 @@ declare interface YouTubeCaptionsResponse {
     };
   }>;
 }
+
+declare type Platform = "bilibili" | "douyin" | "xhs" | "youtube" | "zhihu";

@@ -9,24 +9,18 @@ import { notifier } from "./notifier.mjs";
 
 /**
  * 延时函数
- * @param {number} ms - 延时毫秒数，默认400ms
+ * @param {number} base - 延时毫秒数，默认400ms
+ * @param {number} [random] - 随机延时毫秒数，默认400ms
  * @returns {Promise<void>} - Promise对象
  */
-export const delay = (ms = 500) =>
+export const delay = (base = 500, random = 500) =>
   new Promise((resolve) =>
-    setTimeout(resolve, ms + Math.floor(Math.random() * 500))
+    setTimeout(resolve, base + Math.floor(Math.random() * random))
   );
 
-export class Delay {
-  /**
-   * @param {keyof typeof Delay.prototype.platform_map} platform
-   */
-  constructor(platform) {
-    this.platform = platform;
-    this.config = this.platform_map[platform] || this.platform_map.default;
-  }
-
-  platform_map = {
+/** @type {(platform: Platform) => (ms?: number) => Promise<void>} */
+export function _delay(platform) {
+  const platform_map = {
     bilibili: { base: 100, random: 300 },
     douyin: { base: 150, random: 400 },
     xhs: { base: 200, random: 500 },
@@ -34,13 +28,8 @@ export class Delay {
     zhihu: { base: 120, random: 350 },
     default: { base: 100, random: 400 },
   };
-
-  delay() {
-    const { base, random } = this.config;
-    return new Promise((resolve) =>
-      setTimeout(resolve, base + Math.floor(Math.random() * random))
-    );
-  }
+  const { base, random } = platform_map[platform] || platform_map.default;
+  return (ms = base) => delay(ms || base, random);
 }
 
 /**
@@ -49,8 +38,14 @@ export class Delay {
  * @returns {string} - 清理后的文件名
  */
 export const sanitizeFilename = (filename) => {
-  // 替换Windows和大多数文件系统不允许的字符
-  return filename.replace(/[\\/:*?"<>|]/g, "_");
+  // Windows 非法字符: < > : " / \ | ? *
+  // 以及控制字符和保留名称
+  return filename
+    .replace(/[<>:"/\\|?*]/g, "_")
+    .replace(/[\x00-\x1F\x7F]/g, "_")
+    .replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i, "_$1")
+    .replace(/\.$/, "_")
+    .trim();
 };
 
 /**
