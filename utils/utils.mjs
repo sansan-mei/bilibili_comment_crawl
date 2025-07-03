@@ -178,3 +178,11 @@ export function formatTimestamp(timestamp) {
   const seconds = String(date.getSeconds()).padStart(2, "0");
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+
+/**
+ * 判断是否是macOS
+ * @returns {boolean}
+ */
+export function isMac() {
+  return process.platform === "darwin";
+}

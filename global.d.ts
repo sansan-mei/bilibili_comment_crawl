@@ -9,6 +9,7 @@ declare namespace NodeJS {
     MODEL_PATH: string;
     STATIC_PATH: string;
     YOUTUBE_API_KEY: string;
+    YT_DLP_PATH: string;
   }
 }
 

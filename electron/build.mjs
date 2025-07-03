@@ -1,12 +1,10 @@
 import { notifier } from "#utils/notifier";
-import { delay } from "#utils/utils";
 import { spawn } from "child_process";
 import os from "node:os";
 
 buildApp();
 
 async function buildApp() {
-  await delay(2000);
   notifier.log("开始构建应用...");
 
   // 根据当前平台决定构建参数
